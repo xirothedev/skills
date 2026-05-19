@@ -1,0 +1,30 @@
+{
+  "name": "nestjs-best-practices",
+  "version": "0.1.0",
+  "description": "NestJS API best-practice skill and adapters for coding agents.",
+  "author": {
+    "name": "Xiro"
+  },
+  "homepage": "https://github.com/xirothedev/skills/tree/main/skills/nestjs-best-practices",
+  "repository": "https://github.com/xirothedev/skills",
+  "bugs": {
+    "url": "https://github.com/xirothedev/skills/issues"
+  },
+  "github": {
+    "owner": "xirothedev",
+    "repository": "skills",
+    "issues": "https://github.com/xirothedev/skills/issues",
+    "pullRequests": "https://github.com/xirothedev/skills/pulls"
+  },
+  "license": "MIT",
+  "keywords": [
+    "nestjs",
+    "nodejs",
+    "typescript",
+    "backend",
+    "api",
+    "agent-skills",
+    "coding-agents"
+  ],
+  "skills": "./skills/"
+}
