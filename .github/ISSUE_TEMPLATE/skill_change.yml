@@ -1,0 +1,37 @@
+name: Skill change
+description: Propose a new skill, rule, source update, adapter, or dataset case.
+title: "[Skill]: "
+labels:
+  - enhancement
+body:
+  - type: input
+    id: target
+    attributes:
+      label: Target
+      description: Which skill, rule category, adapter, or source should change?
+      placeholder: "nestjs-best-practices / data-* rules / Codex adapter"
+    validations:
+      required: true
+  - type: textarea
+    id: request
+    attributes:
+      label: Requested change
+      description: Describe the change and the user or agent behavior it should improve.
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: Sources or evidence
+      description: Link official docs, repository examples, bugs, or prior art that justify the change.
+      placeholder: "https://docs.nestjs.com/..."
+    validations:
+      required: false
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope checklist
+      options:
+        - label: This does not vendor another skill pack into the NestJS skill.
+        - label: This can be represented as focused guidance, references, dataset examples, or generated adapter text.
+        - label: This should be validated with `bun run check`.

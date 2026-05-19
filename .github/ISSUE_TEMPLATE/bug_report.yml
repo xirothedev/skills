@@ -1,0 +1,54 @@
+name: Bug report
+description: Report incorrect guidance, broken installer behavior, or stale generated output.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a concrete issue. Include enough context for the maintainer to reproduce or verify it.
+  - type: input
+    id: skill
+    attributes:
+      label: Skill or adapter
+      description: Name the affected skill, adapter, or generated file.
+      placeholder: "nestjs-best-practices, codex adapter, claude adapter"
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What is wrong?
+      placeholder: "The generated adapter points to..."
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What should happen instead?
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Link to files, command output, screenshots, or reproduction steps.
+      placeholder: |
+        1. Run `bun run validate`
+        2. Observe...
+    validations:
+      required: true
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Impact
+      options:
+        - Blocks installation or validation
+        - Produces incorrect guidance
+        - Documentation only
+        - Other
+    validations:
+      required: true

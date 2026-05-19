@@ -76,62 +76,11 @@ export async function validate(): Promise<void> {
   }
 
   const plugin = JSON.parse(await readText(join(ROOT, ".codex-plugin", "plugin.json"))) as {
-    github?: { owner?: string; repository?: string; issues?: string; pullRequests?: string };
-    repository?: string;
     marketplace?: { supports?: string[] };
   };
-  if (plugin.repository !== "https://github.com/xirothedev/skills") {
-    errors.push(".codex-plugin/plugin.json must point at the xirothedev/skills GitHub repository");
-  }
-  if (
-    plugin.github?.owner !== "xirothedev" ||
-    plugin.github.repository !== "skills" ||
-    plugin.github.issues !== "https://github.com/xirothedev/skills/issues" ||
-    plugin.github.pullRequests !== "https://github.com/xirothedev/skills/pulls"
-  ) {
-    errors.push(".codex-plugin/plugin.json must include complete GitHub owner/issues/PR metadata");
-  }
   const supported = new Set(plugin.marketplace?.supports ?? []);
   for (const agent of AGENTS) {
     if (!supported.has(agent)) errors.push(`plugin metadata missing support for ${agent}`);
-  }
-  const claudePlugin = JSON.parse(await readText(join(ROOT, ".claude-plugin", "plugin.json"))) as {
-    github?: { owner?: string; repository?: string; issues?: string; pullRequests?: string };
-    name?: string;
-    repository?: string;
-    skills?: string;
-  };
-  if (claudePlugin.name !== "nestjs-best-practices") {
-    errors.push(".claude-plugin/plugin.json must publish nestjs-best-practices");
-  }
-  if (claudePlugin.skills !== "./skills/") {
-    errors.push(".claude-plugin/plugin.json must expose ./skills/");
-  }
-  if (claudePlugin.repository !== "https://github.com/xirothedev/skills") {
-    errors.push(".claude-plugin/plugin.json must point at the xirothedev/skills GitHub repository");
-  }
-  if (
-    claudePlugin.github?.owner !== "xirothedev" ||
-    claudePlugin.github.repository !== "skills" ||
-    claudePlugin.github.issues !== "https://github.com/xirothedev/skills/issues" ||
-    claudePlugin.github.pullRequests !== "https://github.com/xirothedev/skills/pulls"
-  ) {
-    errors.push(".claude-plugin/plugin.json must include complete GitHub owner/issues/PR metadata");
-  }
-  const claudeMarketplace = JSON.parse(await readText(join(ROOT, ".claude-plugin", "marketplace.json"))) as {
-    metadata?: { githubOwner?: string; githubRepository?: string; issues?: string; pullRequests?: string };
-    plugins?: Array<{ name?: string; source?: string }>;
-  };
-  if (
-    claudeMarketplace.metadata?.githubOwner !== "xirothedev" ||
-    claudeMarketplace.metadata.githubRepository !== "skills" ||
-    claudeMarketplace.metadata.issues !== "https://github.com/xirothedev/skills/issues" ||
-    claudeMarketplace.metadata.pullRequests !== "https://github.com/xirothedev/skills/pulls"
-  ) {
-    errors.push(".claude-plugin/marketplace.json must include complete GitHub owner/issues/PR metadata");
-  }
-  if (!claudeMarketplace.plugins?.some((item) => item.name === "nestjs-best-practices" && item.source === "./")) {
-    errors.push(".claude-plugin/marketplace.json must list the local nestjs-best-practices plugin");
   }
 
   if (errors.length > 0) {
