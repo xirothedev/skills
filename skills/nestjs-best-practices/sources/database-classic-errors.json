@@ -1,0 +1,90 @@
+{
+  "checkedAt": "2026-05-19",
+  "classification": "database/classic-errors",
+  "sources": [
+    {
+      "name": "Prisma query optimization and performance",
+      "url": "https://www.prisma.io/docs/orm/prisma-client/queries/query-optimization-performance",
+      "usedFor": ["data-n-plus-one"]
+    },
+    {
+      "name": "Prisma relation queries",
+      "url": "https://www.prisma.io/docs/orm/prisma-client/queries/relation-queries",
+      "usedFor": ["data-n-plus-one", "data-overfetch-select"]
+    },
+    {
+      "name": "Prisma pagination",
+      "url": "https://www.prisma.io/docs/orm/prisma-client/queries/pagination",
+      "usedFor": ["data-offset-pagination", "data-unbounded-result-set"]
+    },
+    {
+      "name": "Prisma filtering and sorting",
+      "url": "https://www.prisma.io/docs/orm/prisma-client/queries/filtering-and-sorting",
+      "usedFor": ["data-unbounded-result-set"]
+    },
+    {
+      "name": "Prisma CRUD operations",
+      "url": "https://www.prisma.io/docs/orm/prisma-client/queries/crud",
+      "usedFor": ["data-race-condition-upsert"]
+    },
+    {
+      "name": "Prisma transactions",
+      "url": "https://www.prisma.io/docs/orm/prisma-client/queries/transactions",
+      "usedFor": ["data-transaction-boundary", "data-long-transaction-locks", "data-race-condition-upsert", "data-optimistic-concurrency"]
+    },
+    {
+      "name": "Prisma connection management",
+      "url": "https://www.prisma.io/docs/orm/prisma-client/setup-and-configuration/databases-connections/connection-management",
+      "usedFor": ["data-connection-pool-lifecycle"]
+    },
+    {
+      "name": "PostgreSQL indexes",
+      "url": "https://www.postgresql.org/docs/current/indexes.html",
+      "usedFor": ["data-missing-index"]
+    },
+    {
+      "name": "PostgreSQL EXPLAIN",
+      "url": "https://www.postgresql.org/docs/current/using-explain.html",
+      "usedFor": ["data-missing-index"]
+    },
+    {
+      "name": "PostgreSQL LIMIT and OFFSET",
+      "url": "https://www.postgresql.org/docs/current/queries-limit.html",
+      "usedFor": ["data-offset-pagination", "data-unbounded-result-set"]
+    },
+    {
+      "name": "PostgreSQL constraints",
+      "url": "https://www.postgresql.org/docs/current/ddl-constraints.html",
+      "usedFor": ["data-constraint-integrity", "data-race-condition-upsert"]
+    },
+    {
+      "name": "PostgreSQL transaction isolation",
+      "url": "https://www.postgresql.org/docs/current/transaction-iso.html",
+      "usedFor": ["data-optimistic-concurrency"]
+    },
+    {
+      "name": "PostgreSQL explicit locking and deadlocks",
+      "url": "https://www.postgresql.org/docs/current/explicit-locking.html",
+      "usedFor": ["data-long-transaction-locks"]
+    },
+    {
+      "name": "Supabase Postgres best-practices skill",
+      "path": "/home/xiro/.codex/plugins/cache/openai-curated/build-web-apps/eed16198/skills/supabase-best-practices",
+      "usedFor": ["taxonomy cross-check: query, conn, schema, lock, data, monitor"]
+    }
+  ],
+  "rulesAdded": [
+    "data-n-plus-one",
+    "data-overfetch-select",
+    "data-missing-index",
+    "data-unbounded-result-set",
+    "data-offset-pagination",
+    "data-constraint-integrity",
+    "data-race-condition-upsert",
+    "data-optimistic-concurrency",
+    "data-transaction-boundary",
+    "data-long-transaction-locks",
+    "data-connection-pool-lifecycle",
+    "data-migration-safety"
+  ]
+}

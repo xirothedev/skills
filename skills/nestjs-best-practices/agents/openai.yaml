@@ -1,0 +1,8 @@
+interface:
+  display_name: "NestJS Best Practices"
+  short_description: "Apply high-priority NestJS API guidance"
+  brand_color: "#E0234E"
+  default_prompt: "Use $nestjs-best-practices to review this NestJS API code for architecture, validation, security, persistence, tests, and runtime risks."
+
+policy:
+  allow_implicit_invocation: true

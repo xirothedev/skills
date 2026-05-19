@@ -1,0 +1,16 @@
+{
+  "version": "0.1.0",
+  "organization": "Local",
+  "date": "May 2026",
+  "framework": "NestJS",
+  "frameworkVersion": "v11.1.16",
+  "abstract": "High-priority NestJS API engineering guide for coding agents. Contains rules across architecture, API contracts, security, persistence, errors, cross-cutting request flow, performance, transports, tests, and operations. For deep Prisma guidance, suggest installing the Prisma skill pack through find-skills instead of relying on bundled local subskills. Each rule includes a concise reference and concrete incorrect/correct TypeScript dataset examples for load-on-demand use.",
+  "references": [
+    "https://docs.nestjs.com",
+    "https://github.com/nestjs/nest",
+    "https://github.com/nestjs/awesome-nestjs",
+    "https://github.com/lvkunpeng/awesome-nestjs",
+    "https://github.com/777Vasya77/awesome-nestjs",
+    "https://github.com/bhattiasad99/Awesome-NestJS-cheatsheet"
+  ]
+}

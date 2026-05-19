@@ -1,0 +1,78 @@
+{
+  "checkedAt": "2026-05-19",
+  "sources": [
+    {
+      "repo": "nestjs/awesome-nestjs",
+      "defaultBranch": "master",
+      "sha": "d5bc3a2bcb95c6e0af23eb7d0936a7b0e6fbc078",
+      "observedSections": [
+        "Resources",
+        "Projects using NestJS",
+        "Components & Libraries",
+        "Testing",
+        "Integrations",
+        "Runtime"
+      ],
+      "usedFor": [
+        "ecosystem category coverage",
+        "testing utilities",
+        "database integrations",
+        "observability packages",
+        "microservice transports"
+      ]
+    },
+    {
+      "repo": "lvkunpeng/awesome-nestjs",
+      "defaultBranch": "master",
+      "sha": "19cac53ec3e76cbaa9ea00c5b78cbb66a77f2307",
+      "observedSections": [
+        "Chinese resources",
+        "examples",
+        "components and libraries",
+        "integrations",
+        "runtime"
+      ],
+      "usedFor": [
+        "non-English ecosystem coverage",
+        "legacy package awareness",
+        "cross-checking architecture and integration categories"
+      ]
+    },
+    {
+      "repo": "777Vasya77/awesome-nestjs",
+      "defaultBranch": "master",
+      "sha": "a93220c8b056f988878611d138a60d14709106c6",
+      "observedSections": [
+        "README",
+        "VitePress content wrapper"
+      ],
+      "usedFor": [
+        "confirms it mirrors/browses official awesome-nestjs rather than replacing it"
+      ]
+    },
+    {
+      "repo": "bhattiasad99/Awesome-NestJS-cheatsheet",
+      "defaultBranch": "main",
+      "sha": "9b1662ade3783a61119746f388c19de631e00bbc",
+      "observedSections": [
+        "Project setup",
+        "Global validation pipes",
+        "Configuration validation",
+        "Swagger",
+        "Module creation",
+        "Circular dependencies",
+        "Controller service repository patterns",
+        "Guards pipes interceptors filters",
+        "Caching scheduling events",
+        "Best practices",
+        "Troubleshooting"
+      ],
+      "usedFor": [
+        "dataset topic selection",
+        "agent-friendly quick-reference coverage",
+        "validation/config/testing emphasis"
+      ]
+    }
+  ],
+  "policy": "Use awesome lists as a discovery dataset only. Promote guidance into rules only when it aligns with official NestJS docs or versioned framework samples."
+}
