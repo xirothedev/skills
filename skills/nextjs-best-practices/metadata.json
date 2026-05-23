@@ -1,0 +1,23 @@
+{
+  "version": "0.1.0",
+  "organization": "Local",
+  "date": "May 2026",
+  "framework": "Next.js",
+  "frameworkVersion": "v16.1.6",
+  "supportedVersions": ["14.x.x", "15.x.x", "16.x.x"],
+  "abstract": "High-priority Next.js full-stack engineering guide for coding agents. Contains rules across architecture, server components, API routes, data fetching, caching, client components, bundle optimization, performance, security, testing, and operations. Each rule includes a concise reference and concrete incorrect/correct TypeScript/TSX dataset examples for load-on-demand use. Includes upgrade guidance from Next.js 13/14/15 to 16.x.",
+  "deprecatedPatterns": {
+    "middleware": "Use proxy.ts in Next.js 16+ (middleware.ts renamed to clarify network boundary)",
+    "getServerSideProps": "Use async Server Components with fetch() instead",
+    "getStaticProps": "Use generateStaticParams + Server Components instead",
+    "getStaticPaths": "Use generateStaticParams instead",
+    "forwardRef": "Use direct ref prop (React 19 API)",
+    "pagesRouter": "Migrate to App Router (app/ directory)"
+  },
+  "references": [
+    "https://nextjs.org/docs",
+    "https://github.com/vercel/next.js",
+    "https://github.com/unicodeveloper/awesome-nextjs",
+    "https://github.com/officialrajdeepsingh/awesome-nextjs"
+  ]
+}

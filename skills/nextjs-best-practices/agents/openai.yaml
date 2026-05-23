@@ -1,0 +1,6 @@
+name: nextjs-best-practices
+description: Next.js best practices skill for OpenAI agents
+version: "0.1.0"
+instructions: |
+  Use the Next.js best practices skill for all Next.js-related tasks.
+  Load reference files on demand based on the task subsystem.

@@ -1,0 +1,32 @@
+{
+  "generatedAt": "2026-05-23",
+  "versionBaseline": {
+    "framework": "Next.js",
+    "major": 16,
+    "version": "v16.1.6",
+    "discovery": "Context7 /vercel/next.js versions list",
+    "supportedMinors": ["14.x.x", "15.x.x", "16.x.x"]
+  },
+  "officialSources": [
+    {
+      "name": "Next.js official docs",
+      "context7": "/vercel/next.js",
+      "purpose": "Conceptual docs for App Router, Server Components, Client Components, data fetching, caching, revalidation, routing, API routes, Server Actions, configuration, and deployment."
+    },
+    {
+      "name": "Next.js framework repository",
+      "context7": "/vercel/next.js/v16.1.6",
+      "purpose": "Versioned samples and implementation references for latest major behavior."
+    }
+  ],
+  "awesomeSources": [
+    "unicodeveloper/awesome-nextjs",
+    "officialrajdeepsingh/awesome-nextjs"
+  ],
+  "awesomeSourceDetails": "Indexed from unicodeveloper/awesome-nextjs (master) and officialrajdeepsingh/awesome-nextjs (main). 45 boilerplate repos analyzed for patterns.",
+  "externalSkillPacks": {
+    "react-best-practices": "Use vercel-react-best-practices skill for React performance patterns (waterfalls, bundle size, re-renders).",
+    "composition-patterns": "Use vercel-composition-patterns skill for React component architecture patterns."
+  },
+  "policy": "Prefer official Next.js docs and versioned framework samples. Use awesome lists and boilerplate repos for ecosystem discovery and patterns; do not let low-signal community snippets override official guidance. Refresh sources/inventory.json before publishing or using the skill for a new major Next.js version."
+}
