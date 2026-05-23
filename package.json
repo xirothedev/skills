@@ -1,18 +1,22 @@
 {
-  "name": "nestjs-best-practices",
+  "name": "agent-skills",
   "version": "0.1.0",
-  "description": "Agent skill and adapters for NestJS API best practices.",
+  "description": "Standalone agent skill repository with multi-skill build system.",
   "private": true,
   "type": "module",
+  "bin": {
+    "skills": "./src/cli.ts"
+  },
   "scripts": {
     "build": "bun src/cli.ts build",
+    "build:all": "bun src/cli.ts build --all",
     "validate": "bun src/cli.ts validate",
-    "extract-tests": "bun src/cli.ts extract-tests",
+    "extract-tests": "bun src/cli.ts build",
     "sync": "bun src/cli.ts sync",
-    "sync:check": "bun src/cli.ts sync --check",
+    "sync:check": "bun src/cli.ts sync -- --check",
     "dev": "bun run build && bun run validate",
     "install": "bun src/cli.ts install",
-    "research:index": "bun src/cli.ts research:index",
+    "list": "bun src/cli.ts list",
     "check": "bun run validate && bun run build && bun run sync:check"
   },
   "devDependencies": {

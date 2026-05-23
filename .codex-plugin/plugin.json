@@ -52,7 +52,8 @@
       "roo",
       "continue",
       "aider",
-      "opencode"
+      "opencode",
+      "claude-code"
     ]
   }
 }

@@ -1,41 +1,43 @@
+import { join } from "node:path";
+import { ROOT, listSkillNames } from "./paths";
 import { readdir, readFile } from "node:fs/promises";
-import { join, relative } from "node:path";
 import { buildAll } from "./build";
-import { ROOT } from "./paths";
 import { validate } from "./validate";
 
 type Snapshot = Map<string, string>;
 
-const GENERATED_PATHS = [
-  "skills/nestjs-best-practices/AGENTS.md",
-  "skills/nestjs-best-practices/test-cases.json",
-  "dist",
-];
+export async function syncGenerated(options: { check: boolean; skill?: string }): Promise<void> {
+  const skills = options.skill ? [options.skill] : listSkillNames();
+  for (const skill of skills) {
+    const before = options.check ? await snapshotGenerated(skill) : new Map<string, string>();
+    await buildAll(skill);
+    await validate(skill);
 
-export async function syncGenerated(options: { check: boolean }): Promise<void> {
-  const before = options.check ? await snapshotGenerated() : new Map<string, string>();
-  await buildAll();
-  await validate();
+    if (!options.check) {
+      console.log(`synced ${skill}: generated artifacts`);
+      continue;
+    }
 
-  if (!options.check) {
-    console.log("synced generated artifacts");
-    return;
+    const after = await snapshotGenerated(skill);
+    const changed = diffSnapshots(before, after);
+    if (changed.length > 0) {
+      console.error(changed.map((path) => `generated artifact changed: ${path}`).join("\n"));
+      throw new Error(`${skill}: generated artifacts were stale; run \`bun run sync\``);
+    }
+
+    console.log(`${skill}: generated artifacts are in sync`);
   }
-
-  const after = await snapshotGenerated();
-  const changed = diffSnapshots(before, after);
-  if (changed.length > 0) {
-    console.error(changed.map((path) => `generated artifact changed: ${path}`).join("\n"));
-    throw new Error("generated artifacts were stale; run `bun run sync`");
-  }
-
-  console.log("generated artifacts are in sync");
 }
 
-async function snapshotGenerated(): Promise<Snapshot> {
+async function snapshotGenerated(skillName: string): Promise<Snapshot> {
   const snapshot: Snapshot = new Map();
-  for (const generatedPath of GENERATED_PATHS) {
-    await snapshotPath(join(ROOT, generatedPath), snapshot);
+  const paths = [
+    join(ROOT, "skills", skillName, "AGENTS.md"),
+    join(ROOT, "skills", skillName, "test-cases.json"),
+    join(ROOT, "dist", "adapters"),
+  ];
+  for (const p of paths) {
+    await snapshotPath(p, snapshot);
   }
   return snapshot;
 }
@@ -48,7 +50,7 @@ async function snapshotPath(path: string, snapshot: Snapshot): Promise<void> {
     }
   } catch {
     const content = await readFile(path, "utf8").catch(() => "");
-    snapshot.set(relative(ROOT, path), content);
+    snapshot.set(path, content);
   }
 }
 

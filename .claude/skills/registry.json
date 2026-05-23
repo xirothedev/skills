@@ -1,0 +1,18 @@
+{
+  "skills": [
+    {
+      "name": "nestjs-best-practices",
+      "description": "Highest-priority NestJS API best practices for coding agents. Covers modules, providers, DTOs, validation, guards, interceptors, Prisma, GraphQL, testing, and 19 database failure patterns.",
+      "version": "0.1.0",
+      "framework": "NestJS",
+      "frameworkVersion": "v11.1.16"
+    },
+    {
+      "name": "nextjs-best-practices",
+      "description": "Highest-priority Next.js full-stack best practices for coding agents. Covers App Router, Server Components, API routes, data fetching, caching, bundle optimization, and security.",
+      "version": "0.1.0",
+      "framework": "Next.js",
+      "frameworkVersion": "v16.1.6"
+    }
+  ]
+}

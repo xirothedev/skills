@@ -1,6 +1,6 @@
 import { cp, mkdir, readdir, readFile, stat, writeFile } from "node:fs/promises";
 import { dirname, join, relative, resolve } from "node:path";
-import { ADAPTERS_DIR, SKILL_DIR } from "../paths";
+import { ADAPTERS_DIR, SKILLS_DIR, SKILL_DIR } from "../paths";
 import { buildAll } from "../build";
 import { copyFileEnsuringDir, exists } from "../fs-utils";
 import { AGENTS, AgentName, INSTALL_TARGETS } from "./targets";
@@ -11,6 +11,7 @@ export type InstallOptions = {
   dryRun: boolean;
   force: boolean;
   backup: boolean;
+  skill?: string;
 };
 
 type PlannedWrite = {
@@ -20,31 +21,37 @@ type PlannedWrite = {
 };
 
 export async function install(options: InstallOptions): Promise<void> {
-  await buildAll();
+  const skillName = options.skill ?? "nestjs-best-practices";
+  const sourceSkillDir = join(SKILLS_DIR, skillName);
+
+  await buildAll(skillName);
   const agents = options.agent === "all" ? [...AGENTS] : [options.agent];
   const writes: PlannedWrite[] = [];
 
   for (const agent of agents) {
     const target = INSTALL_TARGETS[agent];
     for (const file of target.files) {
+      const resolvedTo = file.to.replace(/skill/g, skillName);
+      const sourceFile = file.from.replace(/skill/g, skillName);
       writes.push({
-        source: join(ADAPTERS_DIR, file.from),
-        target: resolve(options.target, file.to),
+        source: join(ADAPTERS_DIR, sourceFile),
+        target: resolve(options.target, resolvedTo),
         kind: "file",
       });
     }
     if (target.skillCopy) {
+      const resolvedTo = target.skillCopy.to.replace(/skill/g, skillName);
       writes.push({
-        source: SKILL_DIR,
-        target: resolve(options.target, target.skillCopy.to),
+        source: sourceSkillDir,
+        target: resolve(options.target, resolvedTo),
         kind: "directory",
       });
     }
   }
-  if (agents.some((agent) => agent !== "codex" && agent !== "claude")) {
+  if (agents.some((agent) => agent !== "codex" && agent !== "claude" && agent !== "claude-code")) {
     writes.push({
-      source: SKILL_DIR,
-      target: resolve(options.target, ".agent-skills", "nestjs-best-practices"),
+      source: sourceSkillDir,
+      target: resolve(options.target, ".agent-skills", skillName),
       kind: "directory",
     });
   }

@@ -1,7 +1,7 @@
 import { join } from "node:path";
-import { datasetDir, sourcesDir, skillDir } from "../paths";
-import { writeText, readText, listFiles, exists } from "../fs-utils";
-import { loadRules, groupRulesByPrefix } from "../rules";
+import { datasetDir, sourcesDir, skillDir } from "../../../src/paths";
+import { writeText, readText, listFiles, exists } from "../../../src/fs-utils";
+import { loadRules, groupRulesByPrefix } from "../../../src/rules";
 
 const sectionNames: Record<string, string> = {
   arch: "Architecture & Dependency Injection",

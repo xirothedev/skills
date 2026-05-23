@@ -1,15 +1,7 @@
 import { join } from "node:path";
-import { datasetDir, skillDir } from "../paths";
-import { readText, writeText, exists } from "../fs-utils";
-import { loadRules } from "../rules";
-
-async function findDatasetFile(datasetPath: string, name: string): Promise<string | null> {
-  for (const ext of [".ts", ".tsx", ".md"]) {
-    const path = join(datasetPath, `${name}${ext}`);
-    if (await exists(path)) return path;
-  }
-  return null;
-}
+import { datasetDir, skillDir } from "../../../src/paths";
+import { readText, writeText } from "../../../src/fs-utils";
+import { loadRules } from "../../../src/rules";
 
 type TestCase = {
   id: string;
@@ -30,17 +22,10 @@ export async function extractTestCases(skillName: string): Promise<TestCase[]> {
   for (const rule of rules) {
     if (!rule.dataset) continue;
     const datasetPath = join(datasetDir(skillName), rule.dataset);
-
-    const incorrectFile = await findDatasetFile(datasetPath, "incorrect");
-    const correctFile = await findDatasetFile(datasetPath, "correct");
-    const notesFile = await findDatasetFile(datasetPath, "notes");
-
-    if (!incorrectFile || !correctFile || !notesFile) continue;
-
     const [incorrect, correct, notes] = await Promise.all([
-      readText(incorrectFile),
-      readText(correctFile),
-      readText(notesFile),
+      readText(join(datasetPath, "incorrect.ts")),
+      readText(join(datasetPath, "correct.ts")),
+      readText(join(datasetPath, "notes.md")),
     ]);
 
     cases.push({

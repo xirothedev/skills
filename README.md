@@ -1,40 +1,53 @@
-# NestJS Best Practices
+# Agent Skills
 
-Standalone agent skill repository for high-priority NestJS API guidance.
+Standalone multi-skill repository for coding agent best practices. Follows the [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) architecture pattern.
 
-The canonical skill lives in `skills/nestjs-best-practices`. Scripts use Bun
-and TypeScript only.
+## Available Skills
+
+- **nestjs-best-practices** — NestJS API guidance (22 rules, 19 database failure patterns)
+- **nextjs-best-practices** — Next.js full-stack guide (28 rules, App Router focused)
+
+## Structure
+
+```
+skills/{name}/          # Each skill directory
+  SKILL.md              # Agent instructions with frontmatter
+  AGENTS.md             # Generated navigation (do not edit)
+  metadata.json         # Skill metadata (version, framework, references)
+  references/           # Rule files (one per pattern)
+  dataset/              # Incorrect/correct code examples
+  sources/              # Source metadata for research
+  test-cases.json       # Generated LLM evaluation cases
+packages/skill-build/   # Shared build tooling
+src/                    # CLI, validation, sync, installers
+dist/adapters/          # Generated adapter artifacts (12 agents)
+.claude/skills/         # Claude Code marketplace registry
+.codex-plugin/          # Codex marketplace plugin metadata
+```
 
 ## Commands
 
 ```bash
-bun run validate
-bun run build
-bun run extract-tests
-bun run sync
-bun run sync:check
-bun run dev
-bun run install -- --agent cursor --target /path/to/project --dry-run
-bun run install -- --agent all --target /path/to/project --dry-run
+bun run build                    # Build all skills
+bun run build -- --skill nextjs  # Build single skill
+bun run validate                 # Validate all skills
+bun run validate -- --skill nestjs
+bun run sync                     # Regenerate and validate artifacts
+bun run sync -- --check          # Fail if artifacts are stale
+bun run list                     # List available skills
+bun run install -- --agent all --target /path
+bun run install -- --agent claude-code --target /path --skill nextjs
 ```
 
-Installers never overwrite existing files unless `--force` is provided. Use
-`--backup` with `--force` to preserve replaced files.
+## Installation
 
-## Structure
+Install skill into any project for a specific coding agent:
 
-- `skills/nestjs-best-practices/references/` - individual rule files.
-- `skills/nestjs-best-practices/dataset/` - incorrect/correct TypeScript cases.
-- `skills/nestjs-best-practices/AGENTS.md` - generated navigation.
-- `skills/nestjs-best-practices/test-cases.json` - generated LLM evaluation cases.
-- `dist/adapters/` - generated adapter artifacts for supported coding agents.
-- `src/` - Bun + TypeScript build, validate, sync, research, and install code.
+```bash
+bun run install -- --agent codex --target /path/to/project
+bun run install -- --agent claude --target /path/to/project
+bun run install -- --agent cursor --target /path/to/project
+bun run install -- --agent all --target /path/to/project --force
+```
 
-## Script Semantics
-
-- `build` regenerates `AGENTS.md`, `test-cases.json`, and adapter artifacts.
-- `validate` checks rule frontmatter, section coverage, dataset links, source metadata, and marketplace agent support.
-- `extract-tests` regenerates only `test-cases.json`.
-- `sync` regenerates generated artifacts and validates the result.
-- `sync:check` fails if generated artifacts are stale.
-- `dev` runs build then validate.
+Supported agents: `codex`, `claude`, `claude-code`, `cursor`, `windsurf`, `gemini`, `copilot`, `cline`, `roo`, `continue`, `aider`, `opencode`

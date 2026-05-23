@@ -1,7 +1,7 @@
 import { join } from "node:path";
-import { ADAPTERS_DIR, skillDir } from "../paths";
-import { writeText } from "../fs-utils";
-import { loadRules } from "../rules";
+import { ADAPTERS_DIR, skillDir } from "../../../src/paths";
+import { writeText } from "../../../src/fs-utils";
+import { loadRules } from "../../../src/rules";
 
 export async function buildAdapters(skillName: string): Promise<void> {
   const rules = await loadRules(skillName);
@@ -15,15 +15,15 @@ export async function buildAdapters(skillName: string): Promise<void> {
   const adapters: Array<{ path: string; content: string }> = [
     { path: `cursor/.cursor/rules/${skillName}.mdc`, content: cursorMdc(summary) },
     { path: `windsurf/.windsurf/rules/${skillName}.md`, content: summary },
-    { path: `gemini/${skillName}.md`, content: summary },
-    { path: `copilot/.github/${skillName}-instructions.md`, content: summary },
+    { path: `gemini/GEMINI.md`, content: summary },
+    { path: `copilot/.github/copilot-instructions.md`, content: summary },
     { path: `cline/.clinerules/${skillName}.md`, content: summary },
     { path: `roo/.roo/rules/${skillName}.md`, content: summary },
     { path: `continue/.continue/rules/${skillName}.md`, content: summary },
-    { path: `aider/${skillName}.md`, content: summary },
-    { path: `opencode/.opencode/${skillName}.md`, content: summary },
-    { path: `claude/${skillName}.md`, content: summary },
-    { path: `codex/${skillName}.md`, content: summary },
+    { path: `aider/CONVENTIONS.md`, content: summary },
+    { path: `opencode/.opencode/AGENTS.md`, content: summary },
+    { path: `claude/CLAUDE.md`, content: summary },
+    { path: `codex/AGENTS.md`, content: summary },
     { path: `claude-code/.claude/skills/${skillName}/CLAUDE.md`, content: summary },
   ];
 

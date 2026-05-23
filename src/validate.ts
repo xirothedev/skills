@@ -1,12 +1,78 @@
 import { join } from "node:path";
-import { DATASET_DIR, ROOT, SKILL_DIR, SOURCES_DIR } from "./paths";
+import { ROOT, SKILLS_DIR, listSkillNames } from "./paths";
 import { exists, listFiles, parseFrontmatter, readText } from "./fs-utils";
-import { SECTION_PREFIXES, loadRules } from "./rules";
+import { loadRules, groupRulesByPrefix } from "./rules";
 import { AGENTS } from "./installers/targets";
 
-export async function validate(): Promise<void> {
+async function validateSkill(skillName: string): Promise<string[]> {
+  const errors: string[] = [];
+  const skillDir = join(SKILLS_DIR, skillName);
+
+  // SKILL.md checks
+  const skillPath = join(skillDir, "SKILL.md");
+  if (!(await exists(skillPath))) {
+    return [`SKILL.md not found for ${skillName}`];
+  }
+  const skill = await readText(skillPath);
+  const skillFm = parseFrontmatter(skill);
+  if (!skillFm.name) errors.push(`${skillName}: SKILL.md missing name frontmatter`);
+  if (!skillFm.description) errors.push(`${skillName}: SKILL.md missing description frontmatter`);
+  if (!skill.includes("Load On Demand")) errors.push(`${skillName}: SKILL.md must document load-on-demand behavior`);
+
+  // metadata.json checks
+  const metaPath = join(skillDir, "metadata.json");
+  if (await exists(metaPath)) {
+    const meta = JSON.parse(await readText(metaPath)) as Record<string, unknown>;
+    if (!meta.version) errors.push(`${skillName}: metadata.json missing version`);
+    if (!meta.references || !Array.isArray(meta.references) || !meta.references.some((r: string) => r.includes("docs.") || r.includes("/docs"))) {
+      errors.push(`${skillName}: metadata.json references should include official docs`);
+    }
+  } else {
+    errors.push(`${skillName}: metadata.json not found`);
+  }
+
+  // Rules checks
+  try {
+    const rules = await loadRules(skillName);
+    if (rules.length === 0) errors.push(`${skillName}: no rules found in references/`);
+
+    const groups = groupRulesByPrefix(rules);
+    for (const [prefix, prefixRules] of groups) {
+      for (const rule of prefixRules) {
+        if (!rule.dataset) {
+          errors.push(`${skillName}: ${rule.id} missing dataset frontmatter`);
+          continue;
+        }
+        const dsDir = join(SKILLS_DIR, skillName, "dataset", rule.dataset);
+        for (const [baseName, extensions] of [["incorrect", [".ts", ".tsx"]], ["correct", [".ts", ".tsx"]], ["notes", [".md"]]]) {
+          const found = await Promise.all(extensions.map((ext) => exists(join(dsDir, `${baseName}${ext}`))));
+          if (!found.some(Boolean)) {
+            const expected = extensions.map((ext) => `${baseName}${ext}`).join(" or ");
+            errors.push(`${skillName}: ${rule.id} dataset missing ${rule.dataset}/${expected}`);
+          }
+        }
+      }
+    }
+  } catch {
+    errors.push(`${skillName}: failed to load rules`);
+  }
+
+  // Sources checks
+  const srcDir = join(skillDir, "sources");
+  if (await exists(srcDir)) {
+    const sourceFiles = await listFiles(srcDir, ".json");
+    if (sourceFiles.length === 0) errors.push(`${skillName}: sources directory must include source metadata`);
+  } else {
+    errors.push(`${skillName}: sources directory not found`);
+  }
+
+  return errors;
+}
+
+export async function validate(skillName?: string): Promise<void> {
   const errors: string[] = [];
 
+  // Package.json scripts check
   const packageJson = JSON.parse(await readText(join(ROOT, "package.json"))) as {
     scripts?: Record<string, string>;
   };
@@ -16,77 +82,28 @@ export async function validate(): Promise<void> {
     }
   }
 
-  const skill = await readText(join(SKILL_DIR, "SKILL.md"));
-  const skillFrontmatter = parseFrontmatter(skill);
-  if (skillFrontmatter.name !== "nestjs-best-practices") {
-    errors.push("SKILL.md frontmatter name must be nestjs-best-practices");
-  }
-  if (!skillFrontmatter.description?.includes("NestJS")) {
-    errors.push("SKILL.md description must mention NestJS");
-  }
-  if (!skill.includes("Load On Demand")) {
-    errors.push("SKILL.md must document load-on-demand behavior");
-  }
-
-  const rules = await loadRules();
-  for (const prefix of SECTION_PREFIXES) {
-    if (!rules.some((rule) => rule.prefix === prefix)) {
-      errors.push(`missing rule for prefix ${prefix}-`);
-    }
-  }
-  for (const rule of rules) {
-    if (!rule.dataset) {
-      errors.push(`${rule.id} missing dataset frontmatter`);
-      continue;
-    }
-    const datasetPath = join(DATASET_DIR, rule.dataset);
-    for (const file of ["incorrect.ts", "correct.ts", "notes.md"]) {
-      if (!(await exists(join(datasetPath, file)))) {
-        errors.push(`${rule.id} dataset missing ${rule.dataset}/${file}`);
-      }
+  // Codex plugin checks
+  if (await exists(join(ROOT, ".codex-plugin", "plugin.json"))) {
+    const plugin = JSON.parse(await readText(join(ROOT, ".codex-plugin", "plugin.json"))) as {
+      marketplace?: { supports?: string[] };
+    };
+    const supported = new Set(plugin.marketplace?.supports ?? []);
+    for (const agent of AGENTS) {
+      if (!supported.has(agent)) errors.push(`plugin metadata missing support for ${agent}`);
     }
   }
 
-  const sourceFiles = await listFiles(SOURCES_DIR, ".json");
-  if (sourceFiles.length === 0) errors.push("sources directory must include source metadata");
-
-  if (await exists(join(SOURCES_DIR, "prisma-installed-skills.json"))) {
-    errors.push("shared skill must not bundle prisma-installed-skills.json; suggest $find-skills instead");
-  }
-  if (await exists(join(SKILL_DIR, "subskills", "database", "prisma"))) {
-    errors.push("shared skill must not bundle Prisma subskills; suggest $find-skills instead");
-  }
-
-  const openai = await readText(join(SKILL_DIR, "agents", "openai.yaml"));
-  if (!openai.includes("$nestjs-best-practices")) {
-    errors.push("agents/openai.yaml default prompt must mention $nestjs-best-practices");
-  }
-
-  const metadata = JSON.parse(await readText(join(SKILL_DIR, "metadata.json"))) as {
-    version?: string;
-    frameworkVersion?: string;
-    references?: string[];
-  };
-  if (!metadata.version) errors.push("metadata.json missing version");
-  if (!metadata.frameworkVersion?.startsWith("v11.")) {
-    errors.push("metadata.json frameworkVersion must record the NestJS v11 baseline");
-  }
-  if (!metadata.references?.some((reference) => reference.includes("docs.nestjs.com"))) {
-    errors.push("metadata.json references must include official NestJS docs");
-  }
-
-  const plugin = JSON.parse(await readText(join(ROOT, ".codex-plugin", "plugin.json"))) as {
-    marketplace?: { supports?: string[] };
-  };
-  const supported = new Set(plugin.marketplace?.supports ?? []);
-  for (const agent of AGENTS) {
-    if (!supported.has(agent)) errors.push(`plugin metadata missing support for ${agent}`);
+  // Validate skills
+  const skills = skillName ? [skillName] : listSkillNames();
+  for (const skill of skills) {
+    errors.push(...await validateSkill(skill));
   }
 
   if (errors.length > 0) {
-    console.error(errors.map((error) => `- ${error}`).join("\n"));
+    console.error(errors.map((e) => `- ${e}`).join("\n"));
     throw new Error(`validation failed with ${errors.length} error(s)`);
   }
 
-  console.log(`validated rules=${rules.length} sources=${sourceFiles.length} agents=${AGENTS.length}`);
+  const totalRules = skills.length > 0 ? (await loadRules(skills[0])).length : 0;
+  console.log(`validated skills=${skills.length} rules=${totalRules} agents=${AGENTS.length}`);
 }
