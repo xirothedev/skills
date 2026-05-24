@@ -1,0 +1,102 @@
+[
+  {
+    "id": "arch-multi-tenant",
+    "title": "Resolve Tenant Identity at the Routing Boundary",
+    "impact": "HIGH",
+    "tags": [
+      "multi-tenant",
+      "hostnames",
+      "routing",
+      "cache",
+      "authorization"
+    ],
+    "dataset": "arch/multi-tenant",
+    "prompt": "Use $nextjs-production-platform to improve this code according to arch-multi-tenant.",
+    "incorrect": "// INCORRECT: Tenant id comes from user-controlled query params.\nexport async function getProducts(searchParams: { tenant?: string }) {\n  return db.product.findMany({ where: { tenantId: searchParams.tenant } });\n}\n",
+    "correct": "// CORRECT: Resolve canonical tenant identity from trusted request host.\nimport { headers } from \"next/headers\";\n\nexport async function getProducts() {\n  const host = (await headers()).get(\"host\");\n  const tenant = await resolveTenantFromHost(host);\n  return db.product.findMany({ where: { tenantId: tenant.id } });\n}\n",
+    "notes": "Resolve tenants from trusted host/path mappings and propagate a canonical tenant id into authorization, data access, and cache keys. Do not let users choose tenant context with query params.\n"
+  },
+  {
+    "id": "arch-multi-zones",
+    "title": "Isolate Static Assets and Routing in Multi-Zones",
+    "impact": "HIGH",
+    "tags": [
+      "multi-zones",
+      "rewrites",
+      "assetPrefix",
+      "micro-frontends"
+    ],
+    "dataset": "arch/multi-zones",
+    "prompt": "Use $nextjs-production-platform to improve this code according to arch-multi-zones.",
+    "incorrect": "// INCORRECT: A zone deployed under /dashboard still uses default asset paths.\nexport const nextConfig = {\n  async rewrites() {\n    return [{ source: \"/dashboard/:path*\", destination: \"https://dashboard.example.com/:path*\" }];\n  },\n};\n",
+    "correct": "// CORRECT: Zone routing includes a separate static asset prefix.\nexport const nextConfig = {\n  assetPrefix: \"/dashboard-static\",\n  async rewrites() {\n    return [\n      { source: \"/dashboard-static/_next/:path*\", destination: \"https://dashboard.example.com/_next/:path*\" },\n      { source: \"/dashboard/:path*\", destination: \"https://dashboard.example.com/dashboard/:path*\" },\n    ];\n  },\n};\n",
+    "notes": "Multi-Zones need explicit path ownership and static asset isolation. Configure `assetPrefix` and rewrites so zones do not collide on `_next` assets.\n"
+  },
+  {
+    "id": "deploy-cache-coordination",
+    "title": "Coordinate Cache Tags Across Instances",
+    "impact": "CRITICAL",
+    "tags": [
+      "cache",
+      "self-hosting",
+      "multi-instance",
+      "revalidation",
+      "cache-handler"
+    ],
+    "dataset": "deploy/cache-coordination",
+    "prompt": "Use $nextjs-production-platform to improve this code according to deploy-cache-coordination.",
+    "incorrect": "// INCORRECT: Each instance keeps independent cache state.\nexport const nextConfig = {\n  cacheComponents: true,\n};\n",
+    "correct": "// CORRECT: Configure a shared cache handler for multi-instance self-hosting.\nexport const nextConfig = {\n  cacheComponents: true,\n  cacheHandler: require.resolve(\"./cache-handler.js\"),\n  cacheMaxMemorySize: 0,\n};\n",
+    "notes": "For multi-instance self-hosting, coordinate cache storage and tag invalidation. Isolated local memory or filesystem cache can leave instances serving stale content.\n"
+  },
+  {
+    "id": "deploy-server-actions-key",
+    "title": "Pin Server Actions Encryption Key Across Instances",
+    "impact": "CRITICAL",
+    "tags": [
+      "server-actions",
+      "self-hosting",
+      "encryption-key",
+      "multi-instance"
+    ],
+    "dataset": "deploy/server-actions-key",
+    "prompt": "Use $nextjs-production-platform to improve this code according to deploy-server-actions-key.",
+    "incorrect": "// INCORRECT: Multi-instance deployment leaves Server Action keys implicit.\nexport const requiredRuntimeEnv = [\"DATABASE_URL\", \"NEXT_PUBLIC_APP_URL\"];\n",
+    "correct": "// CORRECT: Multi-instance self-hosting requires a stable Server Actions key.\nexport const requiredRuntimeEnv = [\n  \"DATABASE_URL\",\n  \"NEXT_PUBLIC_APP_URL\",\n  \"NEXT_SERVER_ACTIONS_ENCRYPTION_KEY\",\n];\n",
+    "notes": "Self-hosted multi-instance deployments should provide a shared `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY`; otherwise Server Action closures can fail across instances or builds.\n"
+  },
+  {
+    "id": "deploy-standalone-docker",
+    "title": "Align Docker Runtime with Next.js Output Mode",
+    "impact": "CRITICAL",
+    "tags": [
+      "docker",
+      "standalone",
+      "output",
+      "runtime",
+      "deployment"
+    ],
+    "dataset": "deploy/standalone-docker",
+    "prompt": "Use $nextjs-production-platform to improve this code according to deploy-standalone-docker.",
+    "incorrect": "// INCORRECT: Runtime image assumes source install and package-manager start.\nexport const dockerfile = `\nFROM oven/bun:1\nWORKDIR /app\nCOPY . .\nRUN bun install\nRUN bun run build\nCMD [\"bun\", \"run\", \"start\"]\n`;\n",
+    "correct": "// CORRECT: Runtime image runs the traced standalone server with Node.\nexport const dockerfile = `\nFROM node:24-alpine AS runner\nWORKDIR /app\nENV NODE_ENV=production\nCOPY --from=builder /app/.next/standalone ./\nCOPY --from=builder /app/.next/static ./.next/static\nCOPY --from=builder /app/public ./public\nCMD [\"node\", \"server.js\"]\n`;\n",
+    "notes": "Next.js standalone output traces the files needed to run the app. The production image should copy the standalone output and run `server.js` with Node unless the project has a deliberate custom server.\n"
+  },
+  {
+    "id": "ops-instrumentation",
+    "title": "Put Production Instrumentation in Next.js Instrumentation Files",
+    "impact": "HIGH",
+    "tags": [
+      "instrumentation",
+      "opentelemetry",
+      "logging",
+      "startup",
+      "observability"
+    ],
+    "dataset": "ops/instrumentation",
+    "prompt": "Use $nextjs-production-platform to improve this code according to ops-instrumentation.",
+    "incorrect": "// INCORRECT: Telemetry starts during render.\nexport default function RootLayout({ children }: { children: React.ReactNode }) {\n  startTelemetry();\n  return <html><body>{children}</body></html>;\n}\n",
+    "correct": "// CORRECT: Next.js instrumentation starts telemetry at runtime startup.\nexport async function register() {\n  if (process.env.NEXT_RUNTIME === \"nodejs\") {\n    await import(\"./instrumentation.node\");\n  }\n}\n",
+    "notes": "Use `instrumentation.ts` for runtime startup hooks. Avoid initializing telemetry inside layouts, components, handlers, or actions where it can run repeatedly.\n"
+  }
+]

@@ -104,6 +104,9 @@ export async function validate(skillName?: string): Promise<void> {
     throw new Error(`validation failed with ${errors.length} error(s)`);
   }
 
-  const totalRules = skills.length > 0 ? (await loadRules(skills[0])).length : 0;
+  let totalRules = 0;
+  for (const skill of skills) {
+    totalRules += (await loadRules(skill)).length;
+  }
   console.log(`validated skills=${skills.length} rules=${totalRules} agents=${AGENTS.length}`);
 }

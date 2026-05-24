@@ -1,0 +1,1 @@
+Private environment variables and privileged SDKs belong in server-only modules. Do not expose them through shared utilities or Client Component imports. Only `NEXT_PUBLIC_` values should be assumed client-visible.

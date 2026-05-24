@@ -1,0 +1,103 @@
+[
+  {
+    "id": "integration-cors-proxy-contract",
+    "title": "Define One Browser Boundary for CORS and Proxying",
+    "impact": "CRITICAL",
+    "tags": [
+      "cors",
+      "proxy",
+      "cookies",
+      "rewrites",
+      "origins"
+    ],
+    "dataset": "integration/cors-proxy-contract",
+    "prompt": "Use $nextjs-nestjs-integration to improve this code according to integration-cors-proxy-contract.",
+    "incorrect": "// INCORRECT: Browser code mixes Next.js BFF and direct NestJS origins.\nexport async function saveUser(user: UserInput) {\n  await fetch(\"/api/users\", { method: \"POST\", body: JSON.stringify(user) });\n  await fetch(\"https://api.example.com/audit\", { method: \"POST\" });\n}\n",
+    "correct": "// CORRECT: Browser code talks to one public boundary.\nexport async function saveUser(user: UserInput) {\n  await fetch(\"/api/users\", {\n    method: \"POST\",\n    body: JSON.stringify(user),\n  });\n}\n",
+    "notes": "Choose one browser boundary. If browsers call Next.js only, keep NestJS internal. If browsers call NestJS directly, configure explicit CORS and cookie policy.\n"
+  },
+  {
+    "id": "integration-deployment-split",
+    "title": "Verify Split Deployment Health and Runtime Alignment",
+    "impact": "HIGH",
+    "tags": [
+      "deployment",
+      "health-checks",
+      "openapi",
+      "docker",
+      "ci"
+    ],
+    "dataset": "integration/deployment-split",
+    "prompt": "Use $nextjs-nestjs-integration to improve this code according to integration-deployment-split.",
+    "incorrect": "// INCORRECT: The frontend deploy does not verify backend health or client drift.\nexport async function release() {\n  await deployWeb();\n}\n",
+    "correct": "// CORRECT: Release checks verify backend and generated client compatibility.\nexport async function release() {\n  await verifyApiHealth();\n  await verifyOpenApiClientIsCurrent();\n  await deployWeb();\n}\n",
+    "notes": "Split deployments need health and contract gates. Verify the NestJS API is reachable and the Next.js generated client matches the current OpenAPI document.\n"
+  },
+  {
+    "id": "integration-openapi-client-boundary",
+    "title": "Generate Clients from NestJS OpenAPI Contracts",
+    "impact": "CRITICAL",
+    "tags": [
+      "openapi",
+      "generated-client",
+      "dto",
+      "contracts",
+      "monorepo"
+    ],
+    "dataset": "integration/openapi-client-boundary",
+    "prompt": "Use $nextjs-nestjs-integration to improve this code according to integration-openapi-client-boundary.",
+    "incorrect": "// INCORRECT: Next.js duplicates a backend DTO by hand.\nexport async function createUser(name: string) {\n  return fetch(`${process.env.NEXT_SERVER_API_ORIGIN}/users`, {\n    method: \"POST\",\n    body: JSON.stringify({ fullName: name }),\n  });\n}\n",
+    "correct": "// CORRECT: Next.js uses a generated client from the NestJS OpenAPI contract.\nimport { api } from \"@/generated/api-client\";\n\nexport async function createUser(name: string) {\n  return api.users.createUser({\n    body: { name },\n  });\n}\n",
+    "notes": "Use generated clients or shared contract packages for NestJS APIs. Handwritten fetch wrappers drift from DTOs, response envelopes, and error contracts.\n"
+  },
+  {
+    "id": "integration-server-component-fetching",
+    "title": "Server Components Should Fetch Backend Data Directly",
+    "impact": "HIGH",
+    "tags": [
+      "server-components",
+      "route-handlers",
+      "bff",
+      "data-fetching"
+    ],
+    "dataset": "integration/server-component-fetching",
+    "prompt": "Use $nextjs-nestjs-integration to improve this code according to integration-server-component-fetching.",
+    "incorrect": "// INCORRECT: Server Component self-fetches the same Next.js app.\nexport default async function ProductsPage() {\n  const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/products`);\n  const products = await res.json();\n  return <Products products={products} />;\n}\n",
+    "correct": "// CORRECT: Server Component calls the backend client directly.\nimport { api } from \"@/generated/api-client\";\n\nexport default async function ProductsPage() {\n  const products = await api.products.list();\n  return <Products products={products} />;\n}\n",
+    "notes": "Server Components should not call the Next.js app's own Route Handlers. Directly use the NestJS client or server-only DAL to avoid build-time failures and extra HTTP round trips.\n"
+  },
+  {
+    "id": "integration-session-propagation",
+    "title": "Propagate Session Context Explicitly to NestJS",
+    "impact": "CRITICAL",
+    "tags": [
+      "auth",
+      "session",
+      "cookies",
+      "bearer-token",
+      "headers"
+    ],
+    "dataset": "integration/session-propagation",
+    "prompt": "Use $nextjs-nestjs-integration to improve this code according to integration-session-propagation.",
+    "incorrect": "// INCORRECT: Forwards all browser headers to the backend.\nimport { headers } from \"next/headers\";\n\nexport async function getMe() {\n  return fetch(`${process.env.NEXT_SERVER_API_ORIGIN}/me`, {\n    headers: await headers(),\n  });\n}\n",
+    "correct": "// CORRECT: Derive a trusted session and send only the backend credential.\nimport { auth } from \"@/lib/auth\";\nimport { api } from \"@/generated/api-client\";\n\nexport async function getMe() {\n  const session = await auth();\n  return api.withToken(session.backendAccessToken).users.me();\n}\n",
+    "notes": "Propagate auth intentionally. Do not forward arbitrary browser headers or trust client-provided identity headers.\n"
+  },
+  {
+    "id": "integration-shared-env-contract",
+    "title": "Split Public, Server-only, and Backend Env Contracts",
+    "impact": "HIGH",
+    "tags": [
+      "environment",
+      "monorepo",
+      "secrets",
+      "next-public",
+      "runtime-config"
+    ],
+    "dataset": "integration/shared-env-contract",
+    "prompt": "Use $nextjs-nestjs-integration to improve this code according to integration-shared-env-contract.",
+    "incorrect": "// INCORRECT: A backend secret is exposed to the browser.\nexport const env = {\n  apiSecret: process.env.NEXT_PUBLIC_API_SECRET!,\n};\n",
+    "correct": "// CORRECT: Public, Next.js server-only, and NestJS backend env are separate.\nexport const webPublicEnv = {\n  appUrl: process.env.NEXT_PUBLIC_APP_URL!,\n};\n\nexport const webServerEnv = {\n  apiOrigin: process.env.NEXT_SERVER_API_ORIGIN!,\n};\n",
+    "notes": "In a monorepo, env files can look shared while runtime exposure differs. Keep browser-public, Next.js server-only, and NestJS backend secrets separate.\n"
+  }
+]

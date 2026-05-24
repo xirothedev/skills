@@ -1,0 +1,17 @@
+{
+  "version": "0.1.0",
+  "organization": "Local",
+  "date": "May 2026",
+  "framework": "Next.js + NestJS",
+  "frameworkVersion": "Next.js v16.2.6 / NestJS v11.1.16",
+  "supportedVersions": ["Next.js 15.x.x", "Next.js 16.x.x", "NestJS 10.x.x", "NestJS 11.x.x"],
+  "abstract": "Integration guidance for projects combining Next.js and NestJS: API ownership, generated clients, session propagation, CORS/proxy contracts, Server Component fetching, shared environment contracts, and split deployments.",
+  "references": [
+    "https://nextjs.org/docs/app/guides/backend-for-frontend",
+    "https://nextjs.org/docs/app/guides/data-security",
+    "https://nextjs.org/docs/app/guides/self-hosting",
+    "https://docs.nestjs.com/openapi/introduction",
+    "https://docs.nestjs.com/security/cors",
+    "https://docs.nestjs.com/recipes/terminus"
+  ]
+}

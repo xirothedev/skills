@@ -1,0 +1,36 @@
+{
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/.agents/**": true,
+    "**/.cache/**": true,
+    "**/.next/**": true,
+    "**/.turbo/**": true,
+    "**/build/**": true,
+    "**/coverage/**": true,
+    "**/dist/**": true,
+    "**/node_modules/**": true,
+    "**/out/**": true,
+    "**/*.backup-*": true,
+    "**/*.tsbuildinfo": true
+  },
+  "search.exclude": {
+    "**/.agents": true,
+    "**/.cache": true,
+    "**/.next": true,
+    "**/.turbo": true,
+    "**/build": true,
+    "**/coverage": true,
+    "**/dist": true,
+    "**/node_modules": true,
+    "**/out": true,
+    "**/*.backup-*": true,
+    "**/*.tsbuildinfo": true
+  },
+  "js/ts.tsserver.watchOptions": {
+    "watchFile": "useFsEvents",
+    "watchDirectory": "useFsEvents",
+    "fallbackPolling": "dynamicPriorityPolling",
+    "synchronousWatchDirectory": false
+  }
+}

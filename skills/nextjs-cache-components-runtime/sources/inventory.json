@@ -1,0 +1,26 @@
+{
+  "generatedAt": "2026-05-23",
+  "versionBaseline": {
+    "framework": "Next.js",
+    "version": "v16.2.6",
+    "feature": "Cache Components"
+  },
+  "officialSources": [
+    {
+      "name": "Caching with Cache Components",
+      "url": "https://nextjs.org/docs/app/getting-started/caching",
+      "purpose": "Core `use cache`, Suspense, runtime APIs, and PPR behavior."
+    },
+    {
+      "name": "Revalidating",
+      "url": "https://nextjs.org/docs/app/getting-started/revalidating",
+      "purpose": "Tag and path invalidation behavior including `updateTag`."
+    },
+    {
+      "name": "Migrating to Cache Components",
+      "url": "https://nextjs.org/docs/app/guides/migrating-to-cache-components",
+      "purpose": "Migration from route segment configs and previous caching model."
+    }
+  ],
+  "policy": "Use this skill only for Cache Components projects. For projects using the previous model, load the general nextjs-best-practices data caching rules first."
+}

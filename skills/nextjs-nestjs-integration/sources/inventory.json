@@ -1,0 +1,30 @@
+{
+  "generatedAt": "2026-05-23",
+  "versionBaseline": {
+    "frontend": "Next.js v16.2.6",
+    "backend": "NestJS v11.1.16"
+  },
+  "officialSources": [
+    {
+      "name": "Next.js Backend for Frontend",
+      "url": "https://nextjs.org/docs/app/guides/backend-for-frontend",
+      "purpose": "BFF public endpoints, proxying, and Server Component caveats."
+    },
+    {
+      "name": "Next.js Data Security",
+      "url": "https://nextjs.org/docs/app/guides/data-security",
+      "purpose": "DAL and server/client data exposure boundaries."
+    },
+    {
+      "name": "NestJS OpenAPI",
+      "url": "https://docs.nestjs.com/openapi/introduction",
+      "purpose": "Stable API contracts and generated client inputs."
+    },
+    {
+      "name": "NestJS CORS",
+      "url": "https://docs.nestjs.com/security/cors",
+      "purpose": "Cross-origin browser contract for split deployments."
+    }
+  ],
+  "policy": "Keep Next.js UI/BFF decisions and NestJS durable API/domain decisions explicit. Do not replace API contracts with ad hoc fetch wrappers."
+}

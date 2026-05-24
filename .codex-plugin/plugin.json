@@ -1,11 +1,11 @@
 {
-  "name": "nestjs-best-practices",
+  "name": "agent-skills",
   "version": "0.1.0",
-  "description": "NestJS API best-practice skill and adapters for coding agents.",
+  "description": "NestJS and Next.js real-project skill packs and adapters for coding agents.",
   "author": {
     "name": "Xiro"
   },
-  "homepage": "https://github.com/xirothedev/skills/tree/main/skills/nestjs-best-practices",
+  "homepage": "https://github.com/xirothedev/skills",
   "repository": "https://github.com/xirothedev/skills",
   "bugs": {
     "url": "https://github.com/xirothedev/skills/issues"
@@ -19,6 +19,7 @@
   "license": "MIT",
   "keywords": [
     "nestjs",
+    "nextjs",
     "nodejs",
     "typescript",
     "backend",
@@ -28,14 +29,14 @@
   ],
   "skills": "./skills/",
   "interface": {
-    "displayName": "NestJS Best Practices",
-    "shortDescription": "High-priority NestJS API guidance for coding agents",
-    "longDescription": "Use this plugin to install NestJS API best-practice guidance into Codex, Claude Code, Cursor, Windsurf, Gemini CLI, GitHub Copilot, Cline, Roo Code, Continue, Aider, and OpenCode.",
+    "displayName": "Agent Skills",
+    "shortDescription": "NestJS and Next.js real-project guidance for coding agents",
+    "longDescription": "Use this plugin to install NestJS and Next.js best-practice guidance into Codex, Claude Code, Cursor, Windsurf, Gemini CLI, GitHub Copilot, Cline, Roo Code, Continue, Aider, and OpenCode.",
     "developerName": "Xiro",
     "category": "Coding",
-    "websiteURL": "https://github.com/xirothedev/skills/tree/main/skills/nestjs-best-practices",
+    "websiteURL": "https://github.com/xirothedev/skills",
     "capabilities": ["Read", "Write"],
-    "defaultPrompt": ["Use $nestjs-best-practices to review this NestJS API implementation."],
+    "defaultPrompt": ["Use the relevant NestJS or Next.js skill to review this implementation."],
     "brandColor": "#E0234E",
     "screenshots": []
   },

@@ -1,0 +1,25 @@
+{
+  "generatedAt": "2026-05-23",
+  "versionBaseline": {
+    "framework": "NestJS",
+    "version": "v11.1.16"
+  },
+  "officialSources": [
+    {
+      "name": "OpenAPI",
+      "url": "https://docs.nestjs.com/openapi/introduction",
+      "purpose": "Swagger module, DTO annotations, and generated API docs."
+    },
+    {
+      "name": "Validation",
+      "url": "https://docs.nestjs.com/techniques/validation",
+      "purpose": "DTO validation and global ValidationPipe configuration."
+    },
+    {
+      "name": "Rate Limiting",
+      "url": "https://docs.nestjs.com/security/rate-limiting",
+      "purpose": "Throttler configuration, proxies, and storage."
+    }
+  ],
+  "policy": "Official NestJS docs are authoritative. Project-specific API conventions should extend, not bypass, these controller and security boundaries."
+}

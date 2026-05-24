@@ -20,7 +20,8 @@
     "check": "bun run validate && bun run build && bun run sync:check"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/node": "latest"
   },
   "engines": {
     "bun": ">=1.1.0"

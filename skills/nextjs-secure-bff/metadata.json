@@ -1,0 +1,17 @@
+{
+  "version": "0.1.0",
+  "organization": "Local",
+  "date": "May 2026",
+  "framework": "Next.js",
+  "frameworkVersion": "v16.2.6",
+  "supportedVersions": ["15.x.x", "16.x.x"],
+  "abstract": "Secure backend-for-frontend guidance for Next.js Route Handlers, Proxy, Server Actions, webhooks, callbacks, data access layers, server-only modules, DTO minimization, and public API boundaries.",
+  "references": [
+    "https://nextjs.org/docs/app/guides/backend-for-frontend",
+    "https://nextjs.org/docs/app/guides/data-security",
+    "https://nextjs.org/docs/app/guides/authentication",
+    "https://nextjs.org/docs/app/guides/content-security-policy",
+    "https://nextjs.org/docs/app/api-reference/file-conventions/route",
+    "https://nextjs.org/docs/app/api-reference/file-conventions/proxy"
+  ]
+}

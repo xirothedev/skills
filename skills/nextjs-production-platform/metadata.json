@@ -1,0 +1,17 @@
+{
+  "version": "0.1.0",
+  "organization": "Local",
+  "date": "May 2026",
+  "framework": "Next.js",
+  "frameworkVersion": "v16.2.6",
+  "supportedVersions": ["15.x.x", "16.x.x"],
+  "abstract": "Production deployment and platform guidance for Next.js Docker/standalone builds, self-hosting, Server Actions encryption keys, shared cache coordination, instrumentation, multi-zones, and multi-tenant apps.",
+  "references": [
+    "https://nextjs.org/docs/app/getting-started/deploying",
+    "https://nextjs.org/docs/app/guides/self-hosting",
+    "https://nextjs.org/docs/app/guides/deploying-to-platforms",
+    "https://nextjs.org/docs/app/guides/open-telemetry",
+    "https://nextjs.org/docs/app/guides/multi-zones",
+    "https://nextjs.org/docs/app/guides/multi-tenant"
+  ]
+}

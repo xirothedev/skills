@@ -1,0 +1,103 @@
+[
+  {
+    "id": "api-proxy-headers",
+    "title": "Separate Upstream Request Headers from Client Response Headers",
+    "impact": "HIGH",
+    "tags": [
+      "proxy",
+      "headers",
+      "rewrites",
+      "response",
+      "upstream"
+    ],
+    "dataset": "api/proxy-headers",
+    "prompt": "Use $nextjs-secure-bff to improve this code according to api-proxy-headers.",
+    "incorrect": "// INCORRECT: This sends incoming request headers back to the client.\nimport { NextRequest, NextResponse } from \"next/server\";\n\nexport function proxy(request: NextRequest) {\n  return NextResponse.next({\n    headers: request.headers,\n  });\n}\n",
+    "correct": "// CORRECT: Only allowlist upstream request headers.\nimport { NextRequest, NextResponse } from \"next/server\";\n\nexport function proxy(_request: NextRequest) {\n  const headers = new Headers();\n  headers.set(\"x-request-id\", crypto.randomUUID());\n\n  return NextResponse.next({\n    request: { headers },\n  });\n}\n",
+    "notes": "In Proxy, `request: { headers }` changes what the app receives, while response headers are visible to clients. Do not forward all incoming headers or leak cookies, tokens, or internal metadata.\n"
+  },
+  {
+    "id": "api-route-boundaries",
+    "title": "Keep Route Handlers at the Public Boundary",
+    "impact": "CRITICAL",
+    "tags": [
+      "route-handlers",
+      "bff",
+      "validation",
+      "errors",
+      "public-api"
+    ],
+    "dataset": "api/route-boundaries",
+    "prompt": "Use $nextjs-secure-bff to improve this code according to api-route-boundaries.",
+    "incorrect": "// INCORRECT: The public Route Handler trusts payload shape and leaks service output.\nimport { createInvoice } from \"@/lib/invoices\";\n\nexport async function POST(request: Request) {\n  const body = await request.json();\n  const invoice = await createInvoice(body);\n\n  return Response.json(invoice);\n}\n",
+    "correct": "// CORRECT: Validate the public request contract and return a minimal response.\nimport { createInvoiceSchema, createInvoice } from \"@/lib/invoices\";\n\nexport async function POST(request: Request) {\n  if (request.headers.get(\"content-type\") !== \"application/json\") {\n    return Response.json({ error: \"Unsupported media type\" }, { status: 415 });\n  }\n\n  const parsed = createInvoiceSchema.safeParse(await request.json());\n  if (!parsed.success) {\n    return Response.json({ error: \"Invalid request\" }, { status: 400 });\n  }\n\n  const invoice = await createInvoice(parsed.data);\n  return Response.json({ id: invoice.id }, { status: 201 });\n}\n",
+    "notes": "Route Handlers are public API endpoints. Validate content type, payload shape, and authorization before calling internal services. Keep public errors generic and return only fields that are part of the public contract.\n"
+  },
+  {
+    "id": "api-webhook-validation",
+    "title": "Validate Webhook and Callback Requests Before Side Effects",
+    "impact": "CRITICAL",
+    "tags": [
+      "webhooks",
+      "callbacks",
+      "signatures",
+      "redirects",
+      "revalidation"
+    ],
+    "dataset": "api/webhook-validation",
+    "prompt": "Use $nextjs-secure-bff to improve this code according to api-webhook-validation.",
+    "incorrect": "// INCORRECT: Anyone can invalidate arbitrary cache tags.\nimport { revalidateTag } from \"next/cache\";\nimport { NextRequest, NextResponse } from \"next/server\";\n\nexport async function GET(request: NextRequest) {\n  const tag = request.nextUrl.searchParams.get(\"tag\")!;\n  revalidateTag(tag);\n  return NextResponse.json({ ok: true });\n}\n",
+    "correct": "// CORRECT: Validate secret and input shape before side effects.\nimport { revalidateTag } from \"next/cache\";\nimport { NextRequest, NextResponse } from \"next/server\";\n\nexport async function GET(request: NextRequest) {\n  const token = request.nextUrl.searchParams.get(\"token\");\n  const tag = request.nextUrl.searchParams.get(\"tag\");\n\n  if (token !== process.env.REVALIDATE_SECRET || !tag) {\n    return NextResponse.json({ ok: false }, { status: 401 });\n  }\n\n  revalidateTag(tag);\n  return NextResponse.json({ ok: true });\n}\n",
+    "notes": "Webhook and callback endpoints need authentication before side effects. Validate signatures or secrets, constrain accepted parameters, and avoid returning sensitive failure details.\n"
+  },
+  {
+    "id": "security-dal-dto",
+    "title": "Isolate Data Access and Return Minimal DTOs",
+    "impact": "CRITICAL",
+    "tags": [
+      "dal",
+      "dto",
+      "server-only",
+      "client-components",
+      "data-security"
+    ],
+    "dataset": "security/dal-dto",
+    "prompt": "Use $nextjs-secure-bff to improve this code according to security-dal-dto.",
+    "incorrect": "// INCORRECT: A full database record is passed into a Client Component.\nimport ProfileCard from \"./profile-card\";\nimport { db } from \"@/lib/db\";\n\nexport default async function ProfilePage({ params }: { params: { id: string } }) {\n  const user = await db.user.findUniqueOrThrow({ where: { id: params.id } });\n  return <ProfileCard user={user} />;\n}\n",
+    "correct": "// CORRECT: A server-only DAL authorizes and returns a minimal DTO.\nimport ProfileCard from \"./profile-card\";\nimport { getProfileDTO } from \"@/data/profile\";\n\nexport default async function ProfilePage({ params }: { params: { id: string } }) {\n  const profile = await getProfileDTO(params.id);\n  return <ProfileCard profile={profile} />;\n}\n",
+    "notes": "Use a Data Access Layer for privileged reads and writes. It should run only on the server, perform authorization, and return DTOs shaped for the UI instead of raw database records.\n"
+  },
+  {
+    "id": "security-env-server-only",
+    "title": "Keep Secrets Behind Server-only Modules",
+    "impact": "CRITICAL",
+    "tags": [
+      "environment",
+      "server-only",
+      "secrets",
+      "client-boundary"
+    ],
+    "dataset": "security/env-server-only",
+    "prompt": "Use $nextjs-secure-bff to improve this code according to security-env-server-only.",
+    "incorrect": "// INCORRECT: This shared module can be imported by client code.\nimport { createClient } from \"@example/admin-sdk\";\n\nexport const adminClient = createClient({\n  apiKey: process.env.ADMIN_API_KEY!,\n});\n",
+    "correct": "// CORRECT: Secrets and privileged SDK clients stay behind a server-only module.\nimport \"server-only\";\nimport { createClient } from \"@example/admin-sdk\";\n\nexport function getAdminClient() {\n  const apiKey = process.env.ADMIN_API_KEY;\n  if (!apiKey) {\n    throw new Error(\"ADMIN_API_KEY is not configured\");\n  }\n  return createClient({ apiKey });\n}\n",
+    "notes": "Private environment variables and privileged SDKs belong in server-only modules. Do not expose them through shared utilities or Client Component imports. Only `NEXT_PUBLIC_` values should be assumed client-visible.\n"
+  },
+  {
+    "id": "security-server-action-authz",
+    "title": "Re-authorize Inside Every Server Action",
+    "impact": "CRITICAL",
+    "tags": [
+      "server-actions",
+      "auth",
+      "authorization",
+      "idor",
+      "mutations"
+    ],
+    "dataset": "security/server-action-authz",
+    "prompt": "Use $nextjs-secure-bff to improve this code according to security-server-action-authz.",
+    "incorrect": "// INCORRECT: The page checks admin status, but the action is still a separate entry point.\nimport { redirect } from \"next/navigation\";\nimport { auth } from \"@/lib/auth\";\nimport { db } from \"@/lib/db\";\n\nexport default async function AdminPage() {\n  const session = await auth();\n  if (!session?.user?.isAdmin) redirect(\"/login\");\n\n  async function deleteUser(formData: FormData) {\n    \"use server\";\n    await db.user.delete({ where: { id: String(formData.get(\"id\")) } });\n  }\n\n  return <form action={deleteUser}>...</form>;\n}\n",
+    "correct": "// CORRECT: The Server Action re-authenticates and delegates authorization to the DAL.\n\"use server\";\n\nimport { auth } from \"@/lib/auth\";\nimport { deleteUserAsAdmin } from \"@/data/users\";\n\nexport async function deleteUserAction(formData: FormData) {\n  const session = await auth();\n  if (!session?.user?.isAdmin) {\n    throw new Error(\"Forbidden\");\n  }\n\n  await deleteUserAsAdmin({\n    actorId: session.user.id,\n    userId: String(formData.get(\"id\")),\n  });\n\n  return { ok: true };\n}\n",
+    "notes": "Server Actions can be invoked outside the visible page UI. Re-check authentication and authorization inside the action or in the server-only DAL function it calls. Page-level redirects do not protect the action.\n"
+  }
+]

@@ -1,0 +1,1 @@
+Next.js standalone output traces the files needed to run the app. The production image should copy the standalone output and run `server.js` with Node unless the project has a deliberate custom server.

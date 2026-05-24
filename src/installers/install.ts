@@ -1,8 +1,8 @@
-import { cp, mkdir, readdir, readFile, stat, writeFile } from "node:fs/promises";
-import { dirname, join, relative, resolve } from "node:path";
-import { ADAPTERS_DIR, SKILLS_DIR, SKILL_DIR } from "../paths";
+import { cp, mkdir, readFile, stat, writeFile } from "fs/promises";
+import { dirname, join, relative, resolve } from "path";
 import { buildAll } from "../build";
 import { copyFileEnsuringDir, exists } from "../fs-utils";
+import { ADAPTERS_DIR, SKILLS_DIR } from "../paths";
 import { AGENTS, AgentName, INSTALL_TARGETS } from "./targets";
 
 export type InstallOptions = {
@@ -31,8 +31,8 @@ export async function install(options: InstallOptions): Promise<void> {
   for (const agent of agents) {
     const target = INSTALL_TARGETS[agent];
     for (const file of target.files) {
-      const resolvedTo = file.to.replace(/skill/g, skillName);
-      const sourceFile = file.from.replace(/skill/g, skillName);
+      const resolvedTo = replaceSkillPlaceholder(file.to, skillName);
+      const sourceFile = replaceSkillPlaceholder(file.from, skillName);
       writes.push({
         source: join(ADAPTERS_DIR, sourceFile),
         target: resolve(options.target, resolvedTo),
@@ -40,7 +40,7 @@ export async function install(options: InstallOptions): Promise<void> {
       });
     }
     if (target.skillCopy) {
-      const resolvedTo = target.skillCopy.to.replace(/skill/g, skillName);
+      const resolvedTo = replaceSkillPlaceholder(target.skillCopy.to, skillName);
       writes.push({
         source: sourceSkillDir,
         target: resolve(options.target, resolvedTo),
@@ -74,6 +74,10 @@ export async function install(options: InstallOptions): Promise<void> {
       await copyFileEnsuringDir(write.source, write.target);
     }
   }
+}
+
+function replaceSkillPlaceholder(path: string, skillName: string): string {
+  return path.replace(/(^|\/)skill(?=([/.-]|$))/g, `$1${skillName}`);
 }
 
 async function printPlan(writes: PlannedWrite[], options: InstallOptions): Promise<void> {

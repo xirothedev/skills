@@ -1,0 +1,17 @@
+{
+  "version": "0.1.0",
+  "organization": "Local",
+  "date": "May 2026",
+  "framework": "NestJS",
+  "frameworkVersion": "v11.1.16",
+  "supportedVersions": ["10.x.x", "11.x.x"],
+  "abstract": "Production NestJS worker, transport, and operations guidance for microservices, hybrid apps, queues, scheduled jobs, cache stores, health checks, logging, lifecycle hooks, and graceful shutdown.",
+  "references": [
+    "https://docs.nestjs.com/microservices/basics",
+    "https://docs.nestjs.com/faq/hybrid-application",
+    "https://docs.nestjs.com/techniques/queues",
+    "https://docs.nestjs.com/techniques/task-scheduling",
+    "https://docs.nestjs.com/techniques/caching",
+    "https://docs.nestjs.com/recipes/terminus"
+  ]
+}

@@ -1,0 +1,1 @@
+Server Actions can be invoked outside the visible page UI. Re-check authentication and authorization inside the action or in the server-only DAL function it calls. Page-level redirects do not protect the action.

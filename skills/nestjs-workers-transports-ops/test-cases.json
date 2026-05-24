@@ -1,0 +1,101 @@
+[
+  {
+    "id": "ops-cache-store",
+    "title": "Use External Cache Stores for Shared Runtime State",
+    "impact": "HIGH",
+    "tags": [
+      "cache-manager",
+      "redis",
+      "cache-module",
+      "multi-instance"
+    ],
+    "dataset": "ops/cache-store",
+    "prompt": "Use $nestjs-workers-transports-ops to improve this code according to ops-cache-store.",
+    "incorrect": "// INCORRECT: Each process gets a separate local cache.\nCacheModule.register({\n  ttl: 60,\n});\n",
+    "correct": "// CORRECT: Production cache uses an external store.\nCacheModule.registerAsync({\n  inject: [ConfigService],\n  useFactory: (config: ConfigService) => ({\n    stores: [createKeyv(config.getOrThrow(\"REDIS_URL\"))],\n  }),\n});\n",
+    "notes": "Use an external cache store for shared runtime state, invalidation, or multi-instance deployments. In-memory cache is process-local.\n"
+  },
+  {
+    "id": "ops-health-logging",
+    "title": "Expose Health and Structured Logs for Workers",
+    "impact": "HIGH",
+    "tags": [
+      "health-checks",
+      "logger",
+      "terminus",
+      "observability",
+      "workers"
+    ],
+    "dataset": "ops/health-logging",
+    "prompt": "Use $nestjs-workers-transports-ops to improve this code according to ops-health-logging.",
+    "incorrect": "// INCORRECT: Unstructured logs are hard to alert on or correlate.\nconsole.log(\"job failed\", error);\n",
+    "correct": "// CORRECT: Structured logs include job and dependency context.\nthis.logger.error(\"job failed\", {\n  jobId: job.id,\n  queue: job.queueName,\n  cause: error instanceof Error ? error.message : \"unknown\",\n});\n",
+    "notes": "Workers need structured logs, health checks, and lifecycle/shutdown handling for brokers, queues, databases, and cache dependencies.\n"
+  },
+  {
+    "id": "ops-queue-idempotency",
+    "title": "Make Queue Jobs Idempotent and Retry-safe",
+    "impact": "CRITICAL",
+    "tags": [
+      "queues",
+      "bull",
+      "bullmq",
+      "idempotency",
+      "retries"
+    ],
+    "dataset": "ops/queue-idempotency",
+    "prompt": "Use $nestjs-workers-transports-ops to improve this code according to ops-queue-idempotency.",
+    "incorrect": "// INCORRECT: A retry can send the same email twice.\n@Process(\"send-email\")\nasync send(job: Job<EmailJob>) {\n  await this.mailer.send(job.data);\n}\n",
+    "correct": "// CORRECT: The processor is retry-safe.\n@Process(\"send-email\")\nasync send(job: Job<EmailJob>) {\n  if (await this.outbox.wasProcessed(job.id)) {\n    return;\n  }\n\n  await this.mailer.send(job.data);\n  await this.outbox.markProcessed(job.id);\n}\n",
+    "notes": "Queues usually provide at-least-once delivery. Make processors idempotent before external side effects such as email, payments, or webhooks.\n"
+  },
+  {
+    "id": "ops-scheduler-locks",
+    "title": "Protect Scheduled Jobs in Multi-instance Deployments",
+    "impact": "CRITICAL",
+    "tags": [
+      "scheduling",
+      "cron",
+      "locks",
+      "multi-instance",
+      "workers"
+    ],
+    "dataset": "ops/scheduler-locks",
+    "prompt": "Use $nestjs-workers-transports-ops to improve this code according to ops-scheduler-locks.",
+    "incorrect": "// INCORRECT: Every app replica will run this cron.\n@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)\nasync billCustomers() {\n  await this.billing.run();\n}\n",
+    "correct": "// CORRECT: A distributed lock prevents duplicate cron side effects.\n@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)\nasync billCustomers() {\n  await this.lock.runOnce(\"billing:daily\", async () => {\n    await this.billing.run();\n  });\n}\n",
+    "notes": "Cron jobs run in each process. Use one worker instance, distributed locks, or leader election for side-effectful scheduled work.\n"
+  },
+  {
+    "id": "transport-hybrid-config",
+    "title": "Inherit Global App Config in Hybrid Microservices",
+    "impact": "CRITICAL",
+    "tags": [
+      "hybrid-app",
+      "microservices",
+      "global-pipes",
+      "inheritAppConfig"
+    ],
+    "dataset": "transport/hybrid-config",
+    "prompt": "Use $nestjs-workers-transports-ops to improve this code according to transport-hybrid-config.",
+    "incorrect": "// INCORRECT: The connected microservice does not inherit global pipes or guards.\napp.connectMicroservice<MicroserviceOptions>({\n  transport: Transport.TCP,\n});\nawait app.startAllMicroservices();\n",
+    "correct": "// CORRECT: The microservice inherits the main app's cross-cutting config.\napp.connectMicroservice<MicroserviceOptions>(\n  {\n    transport: Transport.TCP,\n  },\n  { inheritAppConfig: true },\n);\nawait app.startAllMicroservices();\n",
+    "notes": "Hybrid apps need an explicit decision about global pipes, guards, filters, and interceptors. Use `inheritAppConfig: true` when the transport should share the HTTP app policy.\n"
+  },
+  {
+    "id": "transport-microservice-errors",
+    "title": "Use Transport-aware Exceptions in Message Handlers",
+    "impact": "CRITICAL",
+    "tags": [
+      "microservices",
+      "rpc-exception",
+      "message-pattern",
+      "errors"
+    ],
+    "dataset": "transport/microservice-errors",
+    "prompt": "Use $nestjs-workers-transports-ops to improve this code according to transport-microservice-errors.",
+    "incorrect": "// INCORRECT: HTTP exceptions do not model RPC failures.\n@MessagePattern({ cmd: \"charge\" })\nasync charge(data: ChargeMessage) {\n  if (!data.accountId) {\n    throw new BadRequestException(\"accountId is required\");\n  }\n  return this.billing.charge(data);\n}\n",
+    "correct": "// CORRECT: Message handlers use transport-aware exceptions.\n@MessagePattern({ cmd: \"charge\" })\nasync charge(data: ChargeMessage) {\n  if (!data.accountId) {\n    throw new RpcException({ code: \"INVALID_PAYLOAD\" });\n  }\n  return this.billing.charge(data);\n}\n",
+    "notes": "Microservice handlers and guards should use `RpcException` or transport-specific filters. HTTP exceptions are for HTTP controllers.\n"
+  }
+]

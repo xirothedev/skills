@@ -1,5 +1,6 @@
 node_modules/
 dist/
+.agents/
 bun.lockb
 *.tsbuildinfo
 .DS_Store

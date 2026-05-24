@@ -1,0 +1,17 @@
+{
+  "version": "0.1.0",
+  "organization": "Local",
+  "date": "May 2026",
+  "framework": "Next.js",
+  "frameworkVersion": "v16.2.6",
+  "supportedVersions": ["16.x.x"],
+  "abstract": "Next.js 16 Cache Components guidance for `use cache`, Suspense, runtime APIs, tag invalidation, remote cache, metadata runtime access, and migration from older route segment caching configs.",
+  "references": [
+    "https://nextjs.org/docs/app/getting-started/caching",
+    "https://nextjs.org/docs/app/getting-started/revalidating",
+    "https://nextjs.org/docs/app/api-reference/directives/use-cache",
+    "https://nextjs.org/docs/app/api-reference/directives/use-cache-remote",
+    "https://nextjs.org/docs/app/api-reference/config/next-config-js/cacheComponents",
+    "https://nextjs.org/docs/app/guides/migrating-to-cache-components"
+  ]
+}

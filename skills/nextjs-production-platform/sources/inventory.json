@@ -1,0 +1,30 @@
+{
+  "generatedAt": "2026-05-23",
+  "versionBaseline": {
+    "framework": "Next.js",
+    "version": "v16.2.6"
+  },
+  "officialSources": [
+    {
+      "name": "Deploying",
+      "url": "https://nextjs.org/docs/app/getting-started/deploying",
+      "purpose": "Deployment targets, Docker, static export, and adapter overview."
+    },
+    {
+      "name": "Self-Hosting",
+      "url": "https://nextjs.org/docs/app/guides/self-hosting",
+      "purpose": "Multi-instance cache, server actions keys, streaming, and runtime caveats."
+    },
+    {
+      "name": "Multi-Zones",
+      "url": "https://nextjs.org/docs/app/guides/multi-zones",
+      "purpose": "Micro-frontend routing and asset isolation."
+    },
+    {
+      "name": "Multi-tenant",
+      "url": "https://nextjs.org/docs/app/guides/multi-tenant",
+      "purpose": "Tenant routing and domain/subdomain architecture."
+    }
+  ],
+  "policy": "Use official Next.js docs first, then verify platform-specific support against the chosen hosting provider."
+}

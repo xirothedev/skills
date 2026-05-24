@@ -1,0 +1,100 @@
+[
+  {
+    "id": "cache-metadata-runtime",
+    "title": "Make Metadata Runtime Access Explicit",
+    "impact": "HIGH",
+    "tags": [
+      "metadata",
+      "viewport",
+      "runtime-data",
+      "cache-components"
+    ],
+    "dataset": "cache/metadata-runtime",
+    "prompt": "Use $nextjs-cache-components-runtime to improve this code according to cache-metadata-runtime.",
+    "incorrect": "// INCORRECT: Metadata reads uncached dynamic data.\nexport async function generateMetadata({ params }: { params: { id: string } }) {\n  const product = await db.product.findUnique({ where: { id: params.id } });\n  return { title: product?.name ?? \"Product\" };\n}\n",
+    "correct": "// CORRECT: Metadata uses a cached, minimal data source.\nimport { cacheLife } from \"next/cache\";\n\nasync function getProductMetadata(id: string) {\n  \"use cache\";\n  cacheLife(\"hours\");\n  return db.product.findUnique({\n    where: { id },\n    select: { name: true },\n  });\n}\n\nexport async function generateMetadata({ params }: { params: { id: string } }) {\n  const product = await getProductMetadata(params.id);\n  return { title: product?.name ?? \"Product\" };\n}\n",
+    "notes": "Metadata and viewport runtime access is tracked separately from the page. Cache the metadata source or explicitly defer to request time.\n"
+  },
+  {
+    "id": "cache-migration-segment-configs",
+    "title": "Replace Route Segment Cache Flags with Component Boundaries",
+    "impact": "HIGH",
+    "tags": [
+      "migration",
+      "dynamic",
+      "revalidate",
+      "route-segment-config",
+      "cache-components"
+    ],
+    "dataset": "cache/migration-segment-configs",
+    "prompt": "Use $nextjs-cache-components-runtime to improve this code according to cache-migration-segment-configs.",
+    "incorrect": "// INCORRECT: Old route segment flags hide the actual cache boundary.\nexport const dynamic = \"force-dynamic\";\nexport const revalidate = 60;\n\nexport default async function ProductsPage() {\n  const products = await getProducts();\n  return <Products products={products} />;\n}\n",
+    "correct": "// CORRECT: Cache the stable component directly.\nimport { cacheLife } from \"next/cache\";\n\nasync function ProductsContent() {\n  \"use cache\";\n  cacheLife(\"minutes\");\n  const products = await getProducts();\n  return <Products products={products} />;\n}\n\nexport default function ProductsPage() {\n  return <ProductsContent />;\n}\n",
+    "notes": "When Cache Components are enabled, replace route-level dynamic/static flags with local cache, Suspense, or request-time boundaries.\n"
+  },
+  {
+    "id": "cache-remote-cache",
+    "title": "Use Remote Cache for Durable Shared Runtime Cache",
+    "impact": "HIGH",
+    "tags": [
+      "use-cache-remote",
+      "self-hosting",
+      "serverless",
+      "cache-handlers"
+    ],
+    "dataset": "cache/remote-cache",
+    "prompt": "Use $nextjs-cache-components-runtime to improve this code according to cache-remote-cache.",
+    "incorrect": "// INCORRECT: Assumes in-memory cache is durable across serverless instances.\nimport { cacheLife } from \"next/cache\";\n\nexport async function getReport() {\n  \"use cache\";\n  cacheLife(\"hours\");\n  return buildExpensiveReport();\n}\n",
+    "correct": "// CORRECT: Use remote cache for shared durable results.\nimport { cacheLife } from \"next/cache\";\n\nexport async function getReport() {\n  \"use cache: remote\";\n  cacheLife(\"hours\");\n  return buildExpensiveReport();\n}\n",
+    "notes": "Use remote cache or a platform cache handler when cache entries must survive serverless cold starts or be shared across instances.\n"
+  },
+  {
+    "id": "cache-runtime-suspense",
+    "title": "Wrap Runtime Data Access in Suspense",
+    "impact": "CRITICAL",
+    "tags": [
+      "suspense",
+      "cookies",
+      "headers",
+      "runtime-data",
+      "streaming"
+    ],
+    "dataset": "cache/runtime-suspense",
+    "prompt": "Use $nextjs-cache-components-runtime to improve this code according to cache-runtime-suspense.",
+    "incorrect": "// INCORRECT: Runtime cookie access is not isolated behind Suspense.\nimport { cookies } from \"next/headers\";\n\nexport default async function Page() {\n  const theme = (await cookies()).get(\"theme\")?.value ?? \"light\";\n  return <ThemePanel theme={theme} />;\n}\n",
+    "correct": "// CORRECT: Runtime data streams inside a Suspense boundary.\nimport { Suspense } from \"react\";\nimport { cookies } from \"next/headers\";\n\nasync function ThemePanelFromCookie() {\n  const theme = (await cookies()).get(\"theme\")?.value ?? \"light\";\n  return <ThemePanel theme={theme} />;\n}\n\nexport default function Page() {\n  return (\n    <Suspense fallback={<ThemePanelSkeleton />}>\n      <ThemePanelFromCookie />\n    </Suspense>\n  );\n}\n",
+    "notes": "With Cache Components, runtime APIs require request context. Use Suspense so the static shell can prerender and the runtime island can stream.\n"
+  },
+  {
+    "id": "cache-tag-invalidation",
+    "title": "Match Invalidation API to User Freshness Needs",
+    "impact": "HIGH",
+    "tags": [
+      "updateTag",
+      "revalidateTag",
+      "server-actions",
+      "route-handlers"
+    ],
+    "dataset": "cache/tag-invalidation",
+    "prompt": "Use $nextjs-cache-components-runtime to improve this code according to cache-tag-invalidation.",
+    "incorrect": "// INCORRECT: The mutation leaves the posts cache stale.\n\"use server\";\n\nexport async function createPost(formData: FormData) {\n  await db.post.create({\n    data: { title: String(formData.get(\"title\")) },\n  });\n}\n",
+    "correct": "// CORRECT: Expire the tag immediately for read-your-own-writes.\n\"use server\";\n\nimport { updateTag } from \"next/cache\";\n\nexport async function createPost(formData: FormData) {\n  await db.post.create({\n    data: { title: String(formData.get(\"title\")) },\n  });\n\n  updateTag(\"posts\");\n}\n",
+    "notes": "Use `updateTag` inside Server Actions when the mutating user should immediately see the new data. Use `revalidateTag` from Route Handlers or when eventual freshness is acceptable.\n"
+  },
+  {
+    "id": "cache-use-cache-scope",
+    "title": "Put `use cache` at the Narrowest Stable Boundary",
+    "impact": "CRITICAL",
+    "tags": [
+      "use-cache",
+      "cache-life",
+      "ppr",
+      "data-cache"
+    ],
+    "dataset": "cache/use-cache-scope",
+    "prompt": "Use $nextjs-cache-components-runtime to improve this code according to cache-use-cache-scope.",
+    "incorrect": "// INCORRECT: The whole page is cached, including user-specific data.\nimport { cacheLife } from \"next/cache\";\n\nexport default async function DashboardPage() {\n  \"use cache\";\n  cacheLife(\"hours\");\n\n  const user = await getCurrentUser();\n  const stats = await getExpensiveStats();\n\n  return <Dashboard user={user} stats={stats} />;\n}\n",
+    "correct": "// CORRECT: Cache the stable computation, not the personalized page.\nimport { cacheLife } from \"next/cache\";\n\nasync function getExpensiveStats() {\n  \"use cache\";\n  cacheLife(\"hours\");\n  return db.stats.findMany();\n}\n\nexport default async function DashboardPage() {\n  const user = await getCurrentUser();\n  const stats = await getExpensiveStats();\n  return <Dashboard user={user} stats={stats} />;\n}\n",
+    "notes": "Apply `use cache` at the narrowest stable boundary. Avoid page-level caching when the page mixes shared and personalized data.\n"
+  }
+]

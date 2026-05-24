@@ -1,0 +1,103 @@
+[
+  {
+    "id": "api-file-upload-boundary",
+    "title": "Validate File Uploads Before Storage or Parsing",
+    "impact": "HIGH",
+    "tags": [
+      "file-upload",
+      "validation",
+      "interceptors",
+      "storage",
+      "security"
+    ],
+    "dataset": "api/file-upload-boundary",
+    "prompt": "Use $nestjs-production-api-contracts to improve this code according to api-file-upload-boundary.",
+    "incorrect": "// INCORRECT: Raw upload reaches storage without validation.\n@Post(\"upload\")\n@UseInterceptors(FileInterceptor(\"file\"))\nupload(@UploadedFile() file: Express.Multer.File) {\n  return this.files.save(file);\n}\n",
+    "correct": "// CORRECT: Validate file constraints before storage.\n@Post(\"upload\")\n@UseInterceptors(FileInterceptor(\"file\", uploadOptions))\nupload(\n  @UploadedFile(new ParseFilePipe({ validators }))\n  file: Express.Multer.File,\n) {\n  return this.files.saveValidated(file);\n}\n",
+    "notes": "Validate file size, MIME, extension, and authorization before storage or parsing. Do not trust original file names or client-declared content type alone.\n"
+  },
+  {
+    "id": "api-openapi-contracts",
+    "title": "Keep OpenAPI Contracts Bound to DTOs",
+    "impact": "CRITICAL",
+    "tags": [
+      "openapi",
+      "swagger",
+      "dto",
+      "controllers",
+      "contracts"
+    ],
+    "dataset": "api/openapi-contracts",
+    "prompt": "Use $nestjs-production-api-contracts to improve this code according to api-openapi-contracts.",
+    "incorrect": "// INCORRECT: Untyped payloads produce weak validation and vague OpenAPI schemas.\n@Post()\ncreate(@Body() body: any) {\n  return this.usersService.create(body);\n}\n",
+    "correct": "// CORRECT: DTOs and response types keep runtime validation and OpenAPI aligned.\n@Post()\n@ApiCreatedResponse({ type: UserResponseDto })\ncreate(@Body() dto: CreateUserDto): Promise<UserResponseDto> {\n  return this.usersService.create(dto);\n}\n",
+    "notes": "Bind controller input and output to DTOs. OpenAPI decorators should document the same DTOs that validation and serialization use.\n"
+  },
+  {
+    "id": "api-versioning-error-contracts",
+    "title": "Version Public APIs and Normalize Error Envelopes",
+    "impact": "CRITICAL",
+    "tags": [
+      "versioning",
+      "exception-filters",
+      "errors",
+      "contracts"
+    ],
+    "dataset": "api/versioning-error-contracts",
+    "prompt": "Use $nestjs-production-api-contracts to improve this code according to api-versioning-error-contracts.",
+    "incorrect": "// INCORRECT: Internal details leak to clients and the shape is unstable.\nthrow new Error(`Failed to update ${email}: ${dbError.message}`);\n",
+    "correct": "// CORRECT: Public errors use a stable, documented envelope.\nthrow new BadRequestException({\n  code: \"INVALID_REQUEST\",\n  message: \"Invalid request\",\n});\n",
+    "notes": "Use API versioning for breaking changes and exception filters/public exception types for stable client-facing error contracts. Keep internal details in logs.\n"
+  },
+  {
+    "id": "security-http-hardening",
+    "title": "Centralize HTTP Hardening in Bootstrap",
+    "impact": "HIGH",
+    "tags": [
+      "cors",
+      "helmet",
+      "cookies",
+      "bootstrap",
+      "security"
+    ],
+    "dataset": "security/http-hardening",
+    "prompt": "Use $nestjs-production-api-contracts to improve this code according to security-http-hardening.",
+    "incorrect": "// INCORRECT: Credentialed wildcard CORS is too broad.\napp.enableCors({\n  origin: true,\n  credentials: true,\n});\n",
+    "correct": "// CORRECT: Centralized, explicit HTTP policy in bootstrap.\napp.enableCors({\n  origin: config.allowedOrigins,\n  credentials: true,\n});\napp.use(helmet());\n",
+    "notes": "Configure CORS, Helmet, cookies, proxy trust, and body-size policy in bootstrap. Avoid wildcard origins when credentials are enabled.\n"
+  },
+  {
+    "id": "security-policy-guards",
+    "title": "Compose Guards with Resource Policy Checks",
+    "impact": "CRITICAL",
+    "tags": [
+      "guards",
+      "authorization",
+      "policies",
+      "ownership",
+      "tenants"
+    ],
+    "dataset": "security/policy-guards",
+    "prompt": "Use $nestjs-production-api-contracts to improve this code according to security-policy-guards.",
+    "incorrect": "// INCORRECT: The user is authenticated, but ownership is never checked.\n@UseGuards(JwtAuthGuard)\n@Delete(\":id\")\nremove(@Param(\"id\") id: string) {\n  return this.postsService.remove(id);\n}\n",
+    "correct": "// CORRECT: The service receives the actor and enforces resource policy.\n@UseGuards(JwtAuthGuard)\n@Delete(\":id\")\nremove(@CurrentUser() user: User, @Param(\"id\") id: string) {\n  return this.postsService.removeForActor(user.id, id);\n}\n",
+    "notes": "Authentication is not authorization. Resource-specific policies must check ownership, tenant membership, or role permissions before mutating data.\n"
+  },
+  {
+    "id": "security-rate-limit-proxy",
+    "title": "Configure Rate Limits for Proxy Topology",
+    "impact": "HIGH",
+    "tags": [
+      "throttler",
+      "rate-limiting",
+      "proxy",
+      "trust-proxy",
+      "redis"
+    ],
+    "dataset": "security/rate-limit-proxy",
+    "prompt": "Use $nestjs-production-api-contracts to improve this code according to security-rate-limit-proxy.",
+    "incorrect": "// INCORRECT: Default tracker can collapse all clients behind a proxy.\nThrottlerModule.forRoot([\n  {\n    ttl: 60000,\n    limit: 10,\n  },\n]);\n",
+    "correct": "// CORRECT: Trust the known proxy and customize tracker/storage as needed.\nconst app = await NestFactory.create<NestExpressApplication>(AppModule);\napp.set(\"trust proxy\", \"loopback\");\n\nThrottlerModule.forRootAsync({\n  useFactory: () => [\n    {\n      ttl: 60000,\n      limit: 10,\n    },\n  ],\n});\n",
+    "notes": "Behind proxies, configure trusted proxy behavior and rate-limit tracker extraction. For multiple app instances, use shared throttler storage.\n"
+  }
+]

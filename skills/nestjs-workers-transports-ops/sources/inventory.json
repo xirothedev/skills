@@ -1,0 +1,30 @@
+{
+  "generatedAt": "2026-05-23",
+  "versionBaseline": {
+    "framework": "NestJS",
+    "version": "v11.1.16"
+  },
+  "officialSources": [
+    {
+      "name": "Microservices",
+      "url": "https://docs.nestjs.com/microservices/basics",
+      "purpose": "Transports, message patterns, guards, pipes, interceptors, and RPC exceptions."
+    },
+    {
+      "name": "Queues",
+      "url": "https://docs.nestjs.com/techniques/queues",
+      "purpose": "Queue producers, consumers, events, and Redis-backed processing."
+    },
+    {
+      "name": "Task Scheduling",
+      "url": "https://docs.nestjs.com/techniques/task-scheduling",
+      "purpose": "Cron, intervals, timeouts, and scheduler registry."
+    },
+    {
+      "name": "Caching",
+      "url": "https://docs.nestjs.com/techniques/caching",
+      "purpose": "CacheModule, cache-manager, and external stores."
+    }
+  ],
+  "policy": "Use official NestJS docs for framework semantics and broker/library docs for delivery guarantees, retry semantics, and distributed locks."
+}

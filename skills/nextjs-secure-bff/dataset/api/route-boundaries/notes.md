@@ -1,0 +1,1 @@
+Route Handlers are public API endpoints. Validate content type, payload shape, and authorization before calling internal services. Keep public errors generic and return only fields that are part of the public contract.

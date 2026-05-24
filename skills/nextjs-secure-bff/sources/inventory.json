@@ -1,0 +1,26 @@
+{
+  "generatedAt": "2026-05-23",
+  "versionBaseline": {
+    "framework": "Next.js",
+    "version": "v16.2.6",
+    "discovery": "Next.js DevTools MCP llms index"
+  },
+  "officialSources": [
+    {
+      "name": "Backend for Frontend",
+      "url": "https://nextjs.org/docs/app/guides/backend-for-frontend",
+      "purpose": "Route Handlers, Proxy, public endpoints, payload handling, webhooks, callbacks, and caveats."
+    },
+    {
+      "name": "Data Security",
+      "url": "https://nextjs.org/docs/app/guides/data-security",
+      "purpose": "DAL, server-only modules, DTO minimization, Server Action security, tainting, and audit checklist."
+    },
+    {
+      "name": "Authentication",
+      "url": "https://nextjs.org/docs/app/guides/authentication",
+      "purpose": "Session checks and authorization patterns for Next.js applications."
+    }
+  ],
+  "policy": "Official Next.js docs are authoritative. Use third-party auth library docs only after preserving the security invariants in this skill."
+}

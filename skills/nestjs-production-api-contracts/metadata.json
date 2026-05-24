@@ -1,0 +1,17 @@
+{
+  "version": "0.1.0",
+  "organization": "Local",
+  "date": "May 2026",
+  "framework": "NestJS",
+  "frameworkVersion": "v11.1.16",
+  "supportedVersions": ["10.x.x", "11.x.x"],
+  "abstract": "Production NestJS API contract guidance for OpenAPI/Swagger, DTO validation, versioning, public error envelopes, guards and policies, rate limiting behind proxies, HTTP hardening, and file upload boundaries.",
+  "references": [
+    "https://docs.nestjs.com/openapi/introduction",
+    "https://docs.nestjs.com/techniques/validation",
+    "https://docs.nestjs.com/techniques/versioning",
+    "https://docs.nestjs.com/exception-filters",
+    "https://docs.nestjs.com/guards",
+    "https://docs.nestjs.com/security/rate-limiting"
+  ]
+}
